@@ -1,0 +1,15 @@
+SIMToolbox 1.33 (ver. 2016-10-04)
+
+------------------------------------------------------------------------------------------
+ERROR/NEW OPTION					| FIX
+------------------------------------------------------------------------------------------
+Compatibility with MATLAB R2015b and Windows 10		|
+- version R2015b can't create empty field in existing	|
+  structure with syntax like example.			|
+							|
+example:						|
+							|
+ Sk().O = [];						| [Sk(:).O] = deal([]);
+							|
+ERROR: At least one index is required.			|
+------------------------------------------------------------------------------------------

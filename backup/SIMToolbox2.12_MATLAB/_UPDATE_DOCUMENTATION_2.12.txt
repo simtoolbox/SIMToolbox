@@ -1,0 +1,47 @@
+SIMToolbox 2.12 update (ver. 2019-07-20)
+
+--------------------------------------------------------------------------------------------------------------------------------
+ERROR/NEW OPTION		| FIX
+--------------------------------------------------------------------------------------------------------------------------------
+Calculation only MAP-SIM was 	| process.m
+not able.			| - line 97
+				|   if ~isfield(im,'absexp')				(OLD)
+				|   if ~exist('im','var') || ~isfield(im,'absexp')	(FIX)
+				| - line 180
+				|   if ~any(angles) || ~any([[cfg.vsm.eval.enable], cfg.sim.enable])			(OLD)
+				|   if ~any(angles) || ~any([[cfg.vsm.eval.enable], cfg.sim.enable, cfg.msm.enable])	(FIX)
+--------------------------------------------------------------------------------------------------------------------------------
+Calibration 			| imgflatfield.m
+'Not enougth input arguments'	| - line 29				(OLD)
+				| if nargin < 3 || isempty(IMb)
+				|     IMb = 0;
+				| end;
+				|
+				| if nargin < 3				(FIX)
+				|     IMb = 0;
+				|     scale = 1;
+				| elseif nargin < 4
+				|     scale = 1;
+				|     if isempty(IMb)
+				|         IMb = 0;
+				|     end
+				| end
+--------------------------------------------------------------------------------------------------------------------------------
+Remove temp directory if exists	| SIMToolbox.m
+				| - line 26 - 29
+				| % delete temp if exist
+				| if exist('temp','dir')
+				|     rmdir('temp','s');
+				| end
+--------------------------------------------------------------------------------------------------------------------------------
+Replace waitbar dialogs with the progressbar on the bottom of the GUI,
+--------------------------------------------------------------------------------------------------------------------------------
+"Undefined variable 'guidata'	| setEstimatePatterns.m
+ or class			| - line 85
+ 'uidata.hndl.editAnEval1'."	| 	'Callback','setEstimatePatterns(''editNumangles_Callback'',gcbo,''numangles''',...			(OLD)
+				| 	'Callback','setEstimatePatterns(''editNumangles_Callback'',gcbo,''numangles'',guidata(gcbo))',...	(FIX)
+--------------------------------------------------------------------------------------------------------------------------------
+Error log file to easier location of SIMToolbox errors/failures
+--------------------------------------------------------------------------------------------------------------------------------
+
+

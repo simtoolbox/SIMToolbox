@@ -1,0 +1,11 @@
+hTitle = 10;
+hBtn = 22;    % button
+hTxt = 17;    % text
+hTxtInf = 14; % info text
+hChkBx = 20;  % check box
+hEdtBx = 22;  % edit box
+hPopup = 22;  % pop up menu
+hLine = 24;   % line
+dlgmargin = 5;
+width = 480;
+bkgcolor = [240 240 240] / 255;

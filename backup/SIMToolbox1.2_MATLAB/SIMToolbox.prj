@@ -1,0 +1,119 @@
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration build-checksum="2628128211" file="C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\SIMToolbox1.2_MATLAB\SIMToolbox.prj" location="C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\SIMToolbox1.2_MATLAB" name="SIMToolbox" preferred-package-location="C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\SIMToolbox1.2_MATLAB\SIMToolbox\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>SIMToolbox</param.appname>
+    <param.icon>${PROJECT_ROOT}\SIMToolbox_resources\icon.ico</param.icon>
+    <param.icons>
+      <file>${PROJECT_ROOT}\SIMToolbox_resources\icon_48.png</file>
+      <file>${PROJECT_ROOT}\SIMToolbox_resources\icon_32.png</file>
+      <file>${PROJECT_ROOT}\SIMToolbox_resources\icon_24.png</file>
+      <file>${PROJECT_ROOT}\SIMToolbox_resources\icon_16.png</file>
+    </param.icons>
+    <param.version>1.3</param.version>
+    <param.authnamewatermark>Pavel Krizek, Tomas Lukes</param.authnamewatermark>
+    <param.email>lukestom@fel.cvut.cz</param.email>
+    <param.company />
+    <param.summary>SIMToolbox is an open-source, MATLAB based application designed for processing data acquired by structured illumination microscopy.</param.summary>
+    <param.description>SIMToolbox is an open-source, modular set of functions for MATLAB designed for processing data acquired by structured illumination microscopy. Both optical sectioning and super-resolution applications are supported. The software is also capable of maximum a posteriori probability image estimation (MAP-SIM), an alternative method for reconstruction of structured illumination images. MAP-SIM can potentially reduce reconstruction artifacts, which commonly occur due to refractive index mismatch within the sample and to imperfections in the illumination. For more detail, please visit http://mmtg.fel.cvut.cz/SIMToolbox/</param.description>
+    <param.screenshot>C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\toolbox_v1.3.png</param.screenshot>
+    <param.guid />
+    <param.net.saved.interface />
+    <param.installpath.string>\SIMToolbox\</param.installpath.string>
+    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
+    <param.logo />
+    <param.install.notes />
+    <param.intermediate>${PROJECT_ROOT}\SIMToolbox\for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}\SIMToolbox\for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}\SIMToolbox\for_redistribution</param.output>
+    <param.enable.clean.build>false</param.enable.clean.build>
+    <param.user.defined.mcr.options />
+    <param.embed.ctf>true</param.embed.ctf>
+    <param.target.type>subtarget.standalone</param.target.type>
+    <param.support.packages />
+    <param.required.mcr.products>
+      <item>35000</item>
+      <item>35010</item>
+      <item>35001</item>
+    </param.required.mcr.products>
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>false</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.windows.command.prompt>true</param.windows.command.prompt>
+    <param.create.log>false</param.create.log>
+    <param.log.file />
+    <unset>
+      <param.company />
+      <param.guid />
+      <param.net.saved.interface />
+      <param.installpath.string />
+      <param.installpath.combo />
+      <param.logo />
+      <param.intermediate />
+      <param.files.only />
+      <param.output />
+      <param.enable.clean.build />
+      <param.user.defined.mcr.options />
+      <param.embed.ctf />
+      <param.target.type />
+      <param.support.packages />
+      <param.web.mcr />
+      <param.package.mcr />
+      <param.no.mcr />
+      <param.web.mcr.name />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.windows.command.prompt />
+      <param.create.log />
+      <param.log.file />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\SIMToolbox.m</file>
+    </fileset.main>
+    <fileset.resources>
+      <file>C:\Users\Lukestom\Documents\PhD\Projekt live SIM\KodGit\SIMToolbox1.3_MATLAB\config.m</file>
+      <file>C:\Users\Lukestom\Documents\PhD\Projekt live SIM\KodGit\SIMToolbox1.3_MATLAB\process.m</file>
+      <file>C:\Users\Lukestom\Documents\PhD\Projekt live SIM\KodGit\SIMToolbox1.3_MATLAB\setEstimatePatterns.m</file>
+      <file>C:\Users\Lukestom\Documents\PhD\Projekt live SIM\KodGit\SIMToolbox1.3_MATLAB\setFindPeaks.m</file>
+      <file>C:\Users\Lukestom\Documents\PhD\Projekt live SIM\KodGit\SIMToolbox1.3_MATLAB\spotfinder_method_calibration.m</file>
+      <file>C:\Users\Lukestom\Documents\PhD\Projekt live SIM\KodGit\SIMToolbox1.3_MATLAB\spotfinder_method_spotfinder.m</file>
+      <file>C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\SIMToolbox1.3_MATLAB</file>
+      <file>C:\Users\Lukestom\Documents\PhD\SOFI method\Utils\applyOTF.m</file>
+      <file>C:\Users\Lukestom\Documents\PhD\SOFI method\Utils\createOTF.m</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file location="${PROJECT_ROOT}\SIMToolbox\for_testing" name="readme.txt" optional="true">C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\SIMToolbox1.2_MATLAB\SIMToolbox\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\SIMToolbox\for_testing" name="SIMToolbox.exe" optional="false">C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\SIMToolbox1.2_MATLAB\SIMToolbox\for_testing\SIMToolbox.exe</file>
+      <file location="${PROJECT_ROOT}\SIMToolbox\for_testing" name="splash.png" optional="false">C:\Users\Lukestom\Documents\PhD\Projekt SIM toolbox\verze na web 23.7.2015\SIMToolbox1.2_MATLAB\SIMToolbox\for_testing\splash.png</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2015a</root>
+      <toolboxes>
+        <toolbox name="matlabcoder" />
+      </toolboxes>
+      <toolbox>
+        <matlabcoder>
+          <enabled>true</enabled>
+        </matlabcoder>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.1</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
