@@ -1,4 +1,4 @@
-SIMToolbox: a MATLAB toolbox for structured illumination 
+DEVELOPER VERSION OF SIMToolbox: a MATLAB toolbox for structured illumination 
 fluorescence microscopy
 
 SIMToolbox is an open-source, modular set of functions for MATLAB equipped with a user friendly graphical interface 
