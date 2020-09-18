@@ -4,21 +4,12 @@ SIMToolbox is an open-source, modular set of functions for MATLAB designed for p
 
 Authors: Pavel Křížek, Tomáš Lukeš, Martin Ovesný, Jakub Pospíšil, Vojtěch Terš, Karel Fliegel, and Guy M. Hagen
 
-Published in: Bioinformatics, October 2015, doi: 10.1093/bioinformatics/btv576
+---
 
-For more details go to http://mmtg.fel.cvut.cz/simtoolbox/
+Published in:
+- GigaScience, April 2020, doi: [10.1093/gigascience/giaa035](https://doi.org/10.1093/gigascience/giaa035)
+- GigaScience, January 2019, doi: [10.1093/gigascience/giy126](https://doi.org/10.1093/gigascience/giy126)
+- Bioinformatics, October 2015, doi: [10.1093/bioinformatics/btv576](https://doi.org/10.1093/bioinformatics/btv576)
 
 <!--
 **simtoolbox/SIMToolbox** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
-Here are some ideas to get you started:
-
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
