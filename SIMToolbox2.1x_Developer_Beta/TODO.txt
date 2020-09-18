@@ -1,5 +1,0 @@
-
-- unify the apodization of mapsim with the sr-sim (i.e. let the user to choose from all the sr-sim apodization functions)
-
-- prepare data dir - sinusoidal pattern, line pattern option
-
