@@ -53,7 +53,11 @@ assert(numcomp <= numphases, 'sim_extract: Underdetermined system of equations.'
 % define order of output spectra and precompute separation matrix
 comp = -numharmon:numharmon;    % [ ... -3 -2 -1 0 1 2 3 ... ]
 
-fi = phsoff+2*pi*(0:numphases-1)/numphases;
+if numel(phsoff)>1 
+    fi = phsoff;
+else
+    fi = phsoff+2*pi*(0:numphases-1)/numphases;
+end
 W = exp(1i * fi' * comp);
 
 % FFTs of D(k)

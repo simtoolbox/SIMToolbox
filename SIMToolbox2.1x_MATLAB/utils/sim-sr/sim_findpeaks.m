@@ -41,6 +41,10 @@ switch method.type
             phasSort = sort(angle(peakVal) - 2*pi*(0:ptrn.num-1)'/ptrn.num);
             phasDiff = diff(phasSort);
             phaoff = mod(mean(phasSort(find(min(phasDiff)):find(min(phasDiff))+1)),2*pi);
+            
+%             % (2013) Wicker K. - Non-iterative determination of pattern phase
+%             phaoff = sim_getphase(imfft,peaks.x,peaks.y,cfg);
+            
         else, phaoff = NaN;
         end
     case 'manual'
@@ -48,12 +52,6 @@ switch method.type
         phaoff = cfg.db.manual.phsoff(idx);
     otherwise
         error('sim:findpeaks:method','Unknown method.');
-end
-
-if ~strcmp(method.type,'calibration') && ~isempty(peaks(1).x)
-    
-else
-    
 end
 
 if cfg.plotpeaks

@@ -95,14 +95,16 @@ if ~isfield(datalocal,'imfft') || length(datalocal.imfft)<length(datalocal.ptrn)
     z_cnt = ceil(imginfo.image.size.z/2);
     zz = z_cnt-5:z_cnt+5;
     zz(zz<1|zz>imginfo.image.size.z) = [];
-    TZ = length(tt)+length(zz); kt = 0; kz = 0;
+    TZ = length(tt)+length(zz);
+    kt = 0;
     for t = tt
         kt = kt+1;
+        kz = 0;
         for z = zz
             seqtmp = seqload(imginfo,'t',t,'z',z,'offset',-cfg.ptrn.offset,'datatype','single');
             if kz>0, seq = 0.5.*(seq+seqtmp); else, seq = seqtmp; end
+            progressbarGUI(axPrgBar,(kt+kz)/TZ);
             kz = kz+1;
-            progressbarGUI(axPrgBar,(kt+kz-1)/TZ);
         end
     end
     
@@ -570,7 +572,7 @@ for I = angles
     
     data.cfg.db.manual.k0(I) = k0;
     data.cfg.db.manual.angl(I) = angl;
-    data.cfg.db.manual.phsoff(I) = phsoff;
+    data.cfg.db.manual.phsoff(I) = phsoff(1);
     
     % update preview and data
     drawnow;

@@ -1,4 +1,4 @@
-% Copyright © 2013-2018, Pavel Krizek, Tomas Lukes, Jakub Pospisil
+% Copyright © 2013-2020, Pavel Krizek, Tomas Lukes, Jakub Pospisil
 % email: pospij27@fel.cvut.cz
 %
 % This file is part of SIMToolbox.
@@ -83,7 +83,7 @@ function dlgMain_onquit(~,~)
 global data
 % remove repertoire
 ptrnclose(data.ptrninfo);
-closePreview();
+btnCloseAll_Callback();
 % clear user data
 clear global data
 rmpath(genpath('utils'));
@@ -531,16 +531,16 @@ uicontrol('Parent',hsave,'Style','edit',...
     'HorizontalAlignment','left','BackgroundColor','w');
 
 % ----------- COMMANDS -----------
-% Reset button
-uicontrol('Parent',hmain,'Style','pushbutton','String','Reset settings',...
-    'Tag','btnReset',...
-    'Callback','SIMToolbox(''btnReset_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[width+dlgmargin,psiz(2)-3*dlgmargin-hBtn,90,hBtn]);
-
 % Preview button
 uicontrol('Parent',hmain,'Style','pushbutton','String','Preview',...
     'Tag','btnPreview',...
     'Callback','SIMToolbox(''btnPreview_Callback'',gcbo,[])',...
+    'Units','pixels','Position',[width+dlgmargin,psiz(2)-3*dlgmargin-hBtn,90,hBtn]);
+
+% Close preview button
+uicontrol('Parent',hmain,'Style','pushbutton','String','Close all',...
+    'Tag','btnCloseAll',...
+    'Callback','SIMToolbox(''btnCloseAll_Callback'',gcbo,[])',...
     'Units','pixels','Position',[width+dlgmargin+95,psiz(2)-3*dlgmargin-hBtn,90,hBtn]);
 
 % Preview - z
@@ -586,9 +586,10 @@ uicontrol('Parent',hmain,'Style','pushbutton','String','Quit',...
 % ----------- INITIALIZATION -----------
 % get handles of active objects
 data.hndl = guihandles(hmain);
-data.hndl.preview.sim = nan(1,2);  % sr image + FFT
+data.hndl.preview.sim = nan(1,1);  % sr image
 data.hndl.preview.vsm = nan(1,length(cfg.db.vsm)); % all vsm methods
 data.hndl.preview.msm = nan(1,1);  % map-sim image
+data.hndl.preview.fft = nan(1,3);  % fft of av, sr, mapsim
 
 % configuration
 data.cfg = cfg;
@@ -643,7 +644,7 @@ configReset;
 % read text field (before menu is updated)
 datadir = get(h,'String');
 % close preview images
-closePreview();
+btnCloseAll_Callback();
 % display wait message + disable buttons
 updateDlgMain('off','data');
 % extract path and filename
@@ -762,7 +763,7 @@ function btnPtrnRunCalibration_Callback(~,eventdata)
 %-----------------------------------------------------------------------------
 global data
 % close preview images
-closePreview();
+btnCloseAll_Callback();
 % open dialog
 datadir = uigetdir(fileparts_dir(data.cfg.cal.calibr),'Choose data directory');
 % datadir = uigetdir_workaround(fileparts_dir(data.cfg.cal.calibr),'Choose data directory');
@@ -812,7 +813,7 @@ global data
 % read text field
 filename = get(h,'String');
 % close preview images
-closePreview();
+btnCloseAll_Callback();
 % display wait message + disable buttons
 updateDlgMain('off','ptrn');
 % extract path and filename
@@ -851,7 +852,7 @@ global data
 % read RO
 data.cfg.ptrn.ro = get(h,'Value')-1; % RO starts from zero
 % close preview images
-closePreview();
+btnCloseAll_Callback();
 % clear pattern mask for preview
 data.ptrninfo.MaskOn = [];
 % check for line pattern and set angles
@@ -1012,7 +1013,7 @@ function chkbxSimEnable_Callback(h,~)
 global data
 data.cfg.sim.enable = get(h,'Value');
 if ~data.cfg.sim.enable
-    closePreview();
+    btnCloseAll_Callback();
 end
 updateDlgMain('on');
 
@@ -1038,7 +1039,7 @@ function chkbxMsmEnable_Callback(h,~)
 global data
 data.cfg.msm.enable = get(h,'Value');
 if ~data.cfg.msm.enable
-    closePreview();
+    btnCloseAll_Callback();
 end
 updateDlgMain('on');
 
@@ -1068,7 +1069,7 @@ function chkbxCudaMap_Callback(h,~)
 global data
 switch h.Value
     case 1
-%         updateDlgMain('off');
+        updateDlgMain('off');
         meth = checkGPUdevice();
     case 0
         meth = 'CPU';   
@@ -1082,7 +1083,7 @@ function meth = checkGPUdevice(~)
 global data
 if gpuDeviceCount
     GPUinfo = gpuDevice;
-    if GPUinfo.DriverVersion == data.cfg.msm.gpuDriverVersion
+    if GPUinfo.DriverVersion >= data.cfg.msm.gpuDriverVersion
         meth = 'CUDA';
         txt = sprintf('Device: %s | CUDA driver: v.%.1f | CUDA toolkit: v.%.1f',...
             GPUinfo(1).Name,GPUinfo(1).DriverVersion,GPUinfo(1).ToolkitVersion);
@@ -1121,7 +1122,7 @@ function chkbxVsmEval_Callback(h,idx)
 global data
 data.cfg.vsm.eval(idx).enable = get(h,'Value');
 if ~data.cfg.vsm.eval(idx).enable
-    closePreview();
+    btnCloseAll_Callback();
 end
 updateDlgMain('on');
 
@@ -1205,7 +1206,7 @@ function btnRun_Callback(h,~)
 %-----------------------------------------------------------------------------
 global data
 if strcmp(h.String,'Run')
-    closePreview();
+    btnCloseAll_Callback();
     updateDlgMain('off','run');
     set(h,'String','Cancel');
     if strfind(data.cfg.resdir,'$data$')
@@ -1234,35 +1235,6 @@ function btnQuit_Callback(~,~)
 global data
 close(data.hndl.dlgMain);
 
-%-----------------------------------------------------------------------------
-function btnReset_Callback(~,~)
-%-----------------------------------------------------------------------------
-global data
-% Reset question
-choice = questdlg('Reset all settings?',...
-    'Reset',...
-    'Yes','No','No');
-switch choice
-    case 'Yes'
-        % load default configuration
-        cfgRESET = config();
-        data.cfg.sim = cfgRESET.sim;
-        data.cfg.msm = cfgRESET.msm;
-        data.cfg.vsm = cfgRESET.vsm;
-        % number of harmonics
-        ptrnangles('reset');
-        % set spotfinder method for SR-SIM
-        if isempty(data.calinfo)
-            data.cfg.sim.spotfindermethod = spotfinder_method_spotfinder(data.cfg.db.spotfinder);
-        else
-            data.cfg.sim.spotfindermethod = spotfinder_method_calibration;
-        end
-        progressbarGUI(data.hndl.axPrgBar);
-        updateDlgMain('on','all');
-    case 'No'
-        disp('Reset canceled.');
-end
-
 % ============================================================================
 % PREVIEW
 % ============================================================================
@@ -1271,22 +1243,21 @@ end
 function btnPreview_Callback(h,~)
 %-----------------------------------------------------------------------------
 global data
-% reset and clear progressbar
+
+if (data.cfg.sim.enable || data.cfg.msm.enable) && ...
+        ((~isfield(data,'ptrn') || isempty(data.ptrn)) || ...
+        ~isequal([data.cfg.ptrn.angles.enable],[data.ptrn.enable]))
+    % find and assign peaks
+    data.ptrn = sim_findpeaksassign(data.imginfo,data.ptrninfo,data.calinfo,data.cfg,data.hndl.axPrgBar);
+    if isempty(data.ptrn)
+        updateDlgMain('on','all');
+        return;
+    end
+end
+
 switch h.String
-    case 'Close preview'
-        for I = 1:length(data.cfg.vsm.eval)
-            if ishandle(data.hndl.preview.vsm(I))
-                close(data.hndl.preview.vsm(I));
-            end
-        end
-        for I = 1:2
-            if ishandle(data.hndl.preview.sim(I))
-                close(data.hndl.preview.sim(I));
-            end
-        end
-        if ishandle(data.hndl.preview.msm(1))
-            close(data.hndl.preview.msm(1));
-        end
+    case 'Refresh'
+%         btnCloseAll_Callback();
     case 'Preview'
         updateDlgMain('off','preview');
         
@@ -1308,17 +1279,6 @@ switch h.String
         sp{6} = [sc(1)+2*wi, sc(4)-2*he,wi,he];
         sp{8} = [sc(1)+3*wi, sc(4)-2*he,wi,he];
         
-        if (data.cfg.sim.enable || data.cfg.msm.enable) && ...
-                ((~isfield(data,'ptrn') || isempty(data.ptrn)) || ...
-                ~isequal([data.cfg.ptrn.angles.enable],[data.ptrn.enable]))
-            % find and assign peaks
-            data.ptrn = sim_findpeaksassign(data.imginfo,data.ptrninfo,data.calinfo,data.cfg,data.hndl.axPrgBar);
-            if isempty(data.ptrn)
-                updateDlgMain('on','all');
-                return;
-            end
-        end
-        
         % OS-SIM - create a figure for every method
         for I = 1:length(data.cfg.vsm.eval)
             if data.cfg.vsm.eval(I).enable && ~ishandle(data.hndl.preview.vsm(I))
@@ -1328,63 +1288,108 @@ switch h.String
                     'DeleteFcn',sprintf('SIMToolbox(''onVsmPreviewClose_Callback'',%f,%d)',1,I)); % data.hndl.dlgMain
             end
         end
+        % FFT of Average
+        if any(ismember({data.cfg.db.vsm(find([data.cfg.vsm.eval.enable])).name},{'Average'})) && ...
+            ~ishandle(data.hndl.preview.fft(1))
+            data.hndl.preview.fft(1) = figure; p = p+1;
+            set(gcf,'Name','FFT of Average','NumberTitle','off',...
+                'OuterPosition',sp{p},...
+                'DeleteFcn',sprintf('SIMToolbox(''onFftPreviewClose_Callback'',%f,%d)',1,1)); % data.hndl.dlgMain
+        end
         
         % SR-SIM  - create a figure for sim reconstruction + FFT
         if data.cfg.sim.enable
-            names = {'SR-SIM reconstruction','FFT of SR-SIM reconstruction'};
-            for I = 1:2
-                if ~ishandle(data.hndl.preview.sim(I))
-                    data.hndl.preview.sim(I) = figure; p = p+1;
-                    set(gcf,'Name',names{I},'NumberTitle','off',...
-                        'OuterPosition',sp{p},...
-                        'DeleteFcn',sprintf('SIMToolbox(''onSimPreviewClose_Callback'',%f,%d)',1,I)); % data.hndl.dlgMain
-                end
+            if ~ishandle(data.hndl.preview.sim(1))
+                data.hndl.preview.sim(1) = figure; p = p+1;
+                set(gcf,'Name','SR-SIM reconstruction','NumberTitle','off',...
+                    'OuterPosition',sp{p},...
+                    'DeleteFcn',sprintf('SIMToolbox(''onSimPreviewClose_Callback'',%f,%d)',1,1)); % data.hndl.dlgMain
+            end
+            if ~ishandle(data.hndl.preview.fft(2))
+                data.hndl.preview.fft(2) = figure; p = p+1;
+                set(gcf,'Name','FFT of SR-SIM reconstruction','NumberTitle','off',...
+                    'OuterPosition',sp{p},...
+                    'DeleteFcn',sprintf('SIMToolbox(''onFftPreviewClose_Callback'',%f,%d)',1,2)); % data.hndl.dlgMain
             end
         end
         
         % MAP-SIM  - create a figure for sim reconstruction
         if data.cfg.msm.enable
-            names = {'MAP-SIM reconstruction'};
-            for I = 1
-                if ~ishandle(data.hndl.preview.msm(I))
-                    data.hndl.preview.msm(I) = figure; p = p+1;
-                    set(gcf,'Name', names{I}, 'NumberTitle','off',...
-                        'OuterPosition',sp{p},...
-                        'DeleteFcn', sprintf('SIMToolbox(''onMsmPreviewClose_Callback'',%f,%d)',1,I)); %data.hndl.dlgMain
-                end
+            if ~ishandle(data.hndl.preview.msm(1))
+                data.hndl.preview.msm(1) = figure; p = p+1;
+                set(gcf,'Name','MAP-SIM reconstruction','NumberTitle','off',...
+                    'OuterPosition',sp{p},...
+                    'DeleteFcn', sprintf('SIMToolbox(''onMsmPreviewClose_Callback'',%f,%d)',1,1)); %data.hndl.dlgMain
             end
+            if ~ishandle(data.hndl.preview.fft(3))
+                data.hndl.preview.fft(3) = figure; p = p+1;
+                set(gcf,'Name','FFT of MAP-SIM reconstruction','NumberTitle','off',...
+                    'OuterPosition',sp{p},...
+                    'DeleteFcn',sprintf('SIMToolbox(''onFftPreviewClose_Callback'',%f,%d)',1,3)); % data.hndl.dlgMain
+            end
+            
         end
+end
+% load sequence for the current section & rewind according to pattern offset
+% split sequence if appropriate - based on the running order (e.g,several line patterns)
+seq = seq2subseq(seqload(data.imginfo,'z',data.cfg.preview.z,'t',data.cfg.preview.t,'offset',-data.cfg.ptrn.offset,'datatype','single'),data.ptrninfo,data.cfg.ptrn.ro);
 
-        % load sequence for the current section & rewind according to pattern offset
-        % split sequence if appropriate - based on the running order (e.g,several line patterns)
-        seq = seq2subseq(seqload(data.imginfo,'z',data.cfg.preview.z,'t',data.cfg.preview.t,'offset',-data.cfg.ptrn.offset,'datatype','single'),data.ptrninfo,data.cfg.ptrn.ro);
-               
-        % flatfield correction
-        if data.cfg.vsm.flatfield, [seq,data.calinfo] = runseqflatfield(seq,data.calinfo,data.imginfo); end
-        
-        % stripe removal
-        if data.cfg.vsm.striperemoval, seq = seqstriperemoval(seq); end
-        
-        % background substraction
-        if data.cfg.vsm.bgsubtract
-            thresh = data.cfg.vsm.bgsubtractThresh/data.imginfo.camera.norm;
-            seq = seqbgsubtract(seq,thresh);
-        end
-        
-        % which angles to process
-        angles = logical([data.cfg.ptrn.angles.enable]);
-        
-        os = sum(~isnan(data.hndl.preview.vsm));
-        sr = double(any(data.hndl.preview.sim));
-        mp = double(any(data.hndl.preview.msm));
-        p = os+sr+mp;
-        
-        % show preview figures
-        updateVsmPreview(seq,angles,(0:os)./p);
-        updateSimPreview(seq,angles,[os,os+sr]./p);
-        updateMsmPreview(seq,angles,[os+sr,os+sr+mp]./p);
-        progressbarGUI(data.hndl.axPrgBar,1,'Preview completed');
-        h.String = 'Close preview';
+% flatfield correction
+if data.cfg.vsm.flatfield, [seq,data.calinfo] = runseqflatfield(seq,data.calinfo,data.imginfo); end
+
+% stripe removal
+if data.cfg.vsm.striperemoval, seq = seqstriperemoval(seq); end
+
+% background substraction
+if data.cfg.vsm.bgsubtract
+    thresh = data.cfg.vsm.bgsubtractThresh/data.imginfo.camera.norm;
+    seq = seqbgsubtract(seq,thresh);
+end
+
+% which angles to process
+angles = logical([data.cfg.ptrn.angles.enable]);
+
+os = sum(~isnan(data.hndl.preview.vsm));
+sr = double(any(data.hndl.preview.sim));
+mp = double(any(data.hndl.preview.msm));
+p = os+sr+mp;
+
+% show preview figures
+updateVsmPreview(seq,angles,(0:os)./p);
+updateSimPreview(seq,angles,[os,os+sr]./p);
+updateMsmPreview(seq,angles,[os+sr,os+sr+mp]./p);
+progressbarGUI(data.hndl.axPrgBar,1,'Preview completed');
+
+updatePreviewBtn;
+
+
+%-----------------------------------------------------------------------------
+function btnCloseAll_Callback(~,~)
+%-----------------------------------------------------------------------------
+global data
+for I = 1:length(data.hndl.preview.sim)
+    if ishandle(data.hndl.preview.sim(I))
+        close(data.hndl.preview.sim(I));
+        data.hndl.preview.sim(I) = NaN;
+    end
+end
+for I = 1:length(data.hndl.preview.msm)
+    if ishandle(data.hndl.preview.msm(I))
+        close(data.hndl.preview.msm(I));
+        data.hndl.preview.sim(I) = NaN;
+    end
+end
+for I = 1:length(data.hndl.preview.vsm)
+    if ishandle(data.hndl.preview.vsm(I))
+        close(data.hndl.preview.vsm(I));
+        data.hndl.preview.vsm(I) = NaN;
+    end
+end
+for I = 1:length(data.hndl.preview.fft)
+    if ishandle(data.hndl.preview.fft(I))
+        close(data.hndl.preview.fft(I));
+        data.hndl.preview.fft(I) = NaN;
+    end
 end
 
 %-----------------------------------------------------------------------------
@@ -1417,7 +1422,7 @@ if ~any(ishandle([data.hndl.preview.vsm]))
 end
 % close preview if no pattern is open or number of patterns does not agree
 if isempty(data.ptrninfo) || ptrngetnumseq(data.ptrninfo,data.cfg.ptrn.ro) ~= data.imginfo.image.size.seq
-    closePreview();
+    btnCloseAll_Callback();
     return
 end
 updateDlgMain('off','vsmpreview');
@@ -1443,6 +1448,27 @@ for I = find([data.cfg.vsm.eval.enable])
         figure(data.hndl.preview.vsm(I));
         showimage(IM,data.cfg.preview.saturate,data.cfg.preview.cm);
     end
+    
+    if ishandle(data.hndl.preview.fft(1))
+        IMav = feval(data.cfg.vsm.eval(1).fnc,seq(angles));
+        IMavFFT = seqfft2(IMav);
+        figure(data.hndl.preview.fft(1)); clf
+        showfft(IMavFFT);
+        if isfield(data.cfg.sim.otf.params,'rad')
+            c = size(IMavFFT)./min(size(IMavFFT)); % normalization constant
+            hold on
+            cnt = ceil((size(IMavFFT)+1)/2);
+            t = linspace(0,2*pi,100);
+            
+            rO = 2*data.cfg.sim.otf.params.resolution/data.cfg.sim.otf.params.rad;
+            x = cnt(2) + min(cnt)*c(2)*rO*cos(t);
+            y = cnt(1) + min(cnt)*c(1)*rO*sin(t);
+            plot(x,y,'k-');
+            
+            legend('OTF');
+        end
+    end
+    
     id = id+1;
     progressbarGUI(data.hndl.axPrgBar,se(id),'Calculating OS-SIM preview ...');
 end
@@ -1459,7 +1485,7 @@ end
 se = linspace(se(1),se(2),5);
 % close preview if no pattern is open or number of patterns does not agree
 if isempty(data.ptrninfo) || ptrngetnumseq(data.ptrninfo,data.cfg.ptrn.ro) ~= data.imginfo.image.size.seq
-    closePreview();
+    btnCloseAll_Callback();
     return
 end
 updateDlgMain('off','simpreview');
@@ -1490,8 +1516,8 @@ if data.cfg.sim.enable && any(angles)
         figure(data.hndl.preview.sim(1));
         showimage(IMsr,data.cfg.preview.saturate,data.cfg.preview.cm);
     end
-    if ishandle(data.hndl.preview.sim(2))
-        figure(data.hndl.preview.sim(2)); clf
+    if ishandle(data.hndl.preview.fft(2))
+        figure(data.hndl.preview.fft(2)); clf
         showfft(IMsrFFT);
         if isfield(data.cfg.sim.apodize.params,'rad')
             c = size(IMsrFFT)./min(size(IMsrFFT)); % normalization constant
@@ -1524,7 +1550,7 @@ if ~any(ishandle([data.hndl.preview.msm]))
 end
 % close preview if no pattern is open or number of patterns does not agree
 if isempty(data.ptrninfo) || ptrngetnumseq(data.ptrninfo,data.cfg.ptrn.ro) ~= data.imginfo.image.size.seq
-    closePreview();
+    btnCloseAll_Callback();
     return
 end
 updateDlgMain('off','mapsimpreview');
@@ -1557,7 +1583,7 @@ if any(angles)
             data.cfg.msm.fc]);
     end %%% INIT CUDA ONCE HERE %%%
     
-    IM = mapsim(...
+    IMmap = mapsim(...
         seq(angles),...
         data.ptrninfo.MaskOn(angles),...
         seqcfhomodyne(seq(angles)),...
@@ -1568,12 +1594,35 @@ if any(angles)
         MapcoreCudaFinish();
     end %%% AFTER PROCESSING ALL ZPLANES %%%
 else
-    IM = zeros([data.imginfo.image.size.y,data.imginfo.image.size.x]);
+    IMmap = zeros([data.imginfo.image.size.y,data.imginfo.image.size.x]);
 end
 % show figure with 0.1% values saturated
 if ishandle(data.hndl.preview.msm)
     figure(data.hndl.preview.msm);
-    showimage(IM,data.cfg.preview.saturate,data.cfg.preview.cm);
+    showimage(IMmap,data.cfg.preview.saturate,data.cfg.preview.cm);
+end
+
+if ishandle(data.hndl.preview.fft(3))
+    IMmapFFT = seqfft2(IMmap);
+    figure(data.hndl.preview.fft(3)); clf
+    showfft(IMmapFFT);
+%     if isfield(data.cfg.sim.apodize.params,'rad')
+%         c = size(IMmapFFT)./min(size(IMmapFFT)); % normalization constant
+%         hold on
+%         cnt = ceil((size(IMmapFFT)+1)/2);
+%         t = linspace(0,2*pi,100);
+%         rA = 2*data.cfg.sim.apodize.params.resolution/data.cfg.sim.apodize.params.rad;
+%         x = cnt(2) + min(cnt)*c(2)*rA*cos(t);
+%         y = cnt(1) + min(cnt)*c(1)*rA*sin(t);
+%         plot(x,y,'m-');
+%         
+%         rO = 2*data.cfg.sim.otf.params.resolution/data.cfg.sim.otf.params.rad;
+%         x = cnt(2) + min(cnt)*c(2)*rO*cos(t);
+%         y = cnt(1) + min(cnt)*c(1)*rO*sin(t);
+%         plot(x,y,'k-');
+%         
+%         legend('Apodization','OTF');
+%     end
 end
 
 progressbarGUI(data.hndl.axPrgBar,se(2),'Calculating MAP-SIM preview ...');
@@ -1597,30 +1646,6 @@ axis off square tight
 set(gca,'Position',[0 0 1 1]);
 
 %-----------------------------------------------------------------------------
-function closePreview()
-%-----------------------------------------------------------------------------
-global data
-for I = 1:length(data.hndl.preview.sim)
-    if ishandle(data.hndl.preview.sim(I))
-        close(data.hndl.preview.sim(I));
-        data.hndl.preview.sim(I) = NaN;
-    end
-end
-for I = 1:length(data.hndl.preview.msm)
-    if ishandle(data.hndl.preview.msm(I))
-        close(data.hndl.preview.msm(I));
-        data.hndl.preview.sim(I) = NaN;
-    end
-end
-for I = 1:length(data.hndl.preview.vsm)
-    if ishandle(data.hndl.preview.vsm(I))
-        close(data.hndl.preview.vsm(I));
-        data.hndl.preview.vsm(I) = NaN;
-    end
-end
-% data.hndl
-
-%-----------------------------------------------------------------------------
 function onSimPreviewClose_Callback(~,idx)
 %-----------------------------------------------------------------------------
 global data
@@ -1641,13 +1666,26 @@ global data
 data.hndl.preview.vsm(idx) = NaN;
 updatePreviewBtn;
 
+%-----------------------------------------------------------------------------
+function onFftPreviewClose_Callback(~,idx)
+%-----------------------------------------------------------------------------
+global data
+data.hndl.preview.fft(idx) = NaN;
+updatePreviewBtn;
+
+%-----------------------------------------------------------------------------
 function updatePreviewBtn
+%-----------------------------------------------------------------------------
 global data
 if all([isnan(data.hndl.preview.msm),...
         isnan(data.hndl.preview.sim),...
         isnan(data.hndl.preview.vsm)])
     data.hndl.btnPreview.String = 'Preview';
+    set(data.hndl.btnCloseAll,'Enable','off');
     progressbarGUI(data.hndl.axPrgBar);
+else
+    data.hndl.btnPreview.String = 'Refresh';
+    set(data.hndl.btnCloseAll,'Enable','on');
 end
 
 % ============================================================================
@@ -1996,8 +2034,12 @@ else
 end
 
 % set(data.hndl.btnDefaults,'Enable',state);
-set(data.hndl.btnReset,'Enable',vsmproc);
 set(data.hndl.btnPreview,'Enable',runstate);
+if strcmp(data.hndl.btnPreview.String,'Refresh')
+    set(data.hndl.btnCloseAll,'Enable','on');
+else
+    set(data.hndl.btnCloseAll,'Enable','off');
+end
 set(data.hndl.popPreviewTime,'Value',data.cfg.preview.t,'Enable',vsmproc);
 set(data.hndl.popPreviewZ,'Value',data.cfg.preview.z,'Enable',vsmproc);
 set(data.hndl.popPreviewColormap,'Enable',vsmproc);

@@ -61,16 +61,21 @@ height = hTitle+2*dlgmargin+1*hLine;
 himd = uipanel('Parent',hmain,'Tag','pnlDataDirectory','Units','pixels','Position',[dlgmargin,psiz(2)-height,width-2*dlgmargin,height],'Title','Set path of the image file');
 psiz = get(himd,'Position'); top = psiz(4) - hTitle - dlgmargin;
 
-uicontrol('Parent',himd,'Style','pushbutton','String','Image file:',...
+uicontrol('Parent',himd,'Style','pushbutton','String','Open image',...
     'Tag','btnImageFilePath',...
     'Callback','setEstimatePatterns(''btnImageFilePath_Callback'',gcbo,[],guidata(gcbo))',...
-    'Units','pixels','Position',[dlgmargin,top-1*hLine,100,hBtn]);
+    'Units','pixels','Position',[dlgmargin,top-1*hLine,70,hBtn]);
 
 uicontrol('Parent',himd,'Style','edit',...
     'Tag','editImagePath',...
     'Callback','setEstimatePatterns(''editImagePath_Callback'',gcbo,[],guidata(gcbo))',...
-    'Units','pixels','Position',[dlgmargin+100,top-1*hLine,psiz(3)-3*dlgmargin-100,hEdtBx],...
+    'Units','pixels','Position',[dlgmargin+70,top-1*hLine,psiz(3)-3*dlgmargin-150,hEdtBx],...
     'HorizontalAlignment','left','BackgroundColor','w'); %,'Enable','off'
+
+uicontrol('Parent',himd,'Style','checkbox','String','New folder?',...
+    'Tag','chkbxNewFolder',...
+    'Units','pixels','Position',[psiz(3)-dlgmargin-80,top-1*hLine,psiz(3)-3*dlgmargin-80,hEdtBx],...
+    'HorizontalAlignment','left'); %,'Enable','off'
 
 % ----------- Pattern info  -----------
 height = hTitle+2*dlgmargin+4*hLine;
@@ -273,19 +278,20 @@ else, fol = []; end
     'MultiSelect','off');
 
 if filterIndex ~=0
-    [~,imName,~] = fileparts(fileName);
-    data.prepdir.impath = [datadir,fileName];
-    data.prepdir.imdir = [datadir,imName];
-    data.prepdir.fileName = fileName;
-    
-    fileinfo = imfinfo(data.prepdir.impath);
-    data.prepdir.sx = fileinfo(1).Width;
-    data.prepdir.sy = fileinfo(1).Height;
-    data.prepdir.szt = numel(fileinfo);
-    set(guidata.hndl.editSx,'String',data.prepdir.sx);
-    set(guidata.hndl.editSy,'String',data.prepdir.sy);
+%     [~,imName,~] = fileparts(fileName);
+%     data.prepdir.impath = [datadir,fileName];
+%     data.prepdir.imdir = [datadir,imName];
+%     data.prepdir.fileName = fileName;
+%     
+%     fileinfo = imfinfo(data.prepdir.impath);
+%     data.prepdir.sx = fileinfo(1).Width;
+%     data.prepdir.sy = fileinfo(1).Height;
+%     data.prepdir.szt = numel(fileinfo);
+%     set(guidata.hndl.editSx,'String',data.prepdir.sx);
+%     set(guidata.hndl.editSy,'String',data.prepdir.sy);
     
     set(guidata.hndl.editImagePath,'String',[datadir,fileName]);
+    editImagePath_Callback(guidata.hndl.editImagePath,[],guidata);
 end
 
 
@@ -299,13 +305,16 @@ impath = get(h,'String');
 
 if ~isempty(impath)
     % extract path and filename
-    [datadir,fileName] = extractPathAndFilename(impath,data.prepdir.impath);
-    imName = fileName(1:strfind(fileName,'.')-1); % find position of a dot and image name
-    data.prepdir.impath = [datadir,fileName];
-    data.prepdir.imdir = [datadir,imName];
-    data.prepdir.fileName = fileName;
+    [datadir,imName,ext] = fileparts(impath);
     
-    fileinfo = imfinfo(fileName);
+    % original image file path
+    data.prepdir.impath = impath;
+    
+    % destination image file path
+    data.prepdir.imdir = [datadir filesep imName];
+    data.prepdir.fileName = [imName ext];
+    
+    fileinfo = imfinfo(impath);
     data.prepdir.sx = fileinfo(1).Width;
     data.prepdir.sy = fileinfo(1).Height;
     data.prepdir.szt = numel(fileinfo);
@@ -455,7 +464,6 @@ data.prepdir.bdepth = fileinfo(1).BitDepth;
 % create pattern stucture
 cfg.imsize = struct('x',data.prepdir.sx,'y',data.prepdir.sy);
 cfg.seq = '48449 300us 1-bit Balanced.seq3';
-% cfg.ptrndir = ['patterns' filesep 'lines0o60o120o'];
 cfg.tmpdir = [tempdir filesep];
 
 if isempty(data.prepdir.impath)
@@ -463,12 +471,15 @@ if isempty(data.prepdir.impath)
     uicontrolEnable('on',datalocal);
     return;
 else
+    if ~datalocal.hndl.chkbxNewFolder.Value
+        data.prepdir.imdir = fileparts(data.prepdir.imdir);
+    end
     cfg.ptrndir = data.prepdir.imdir;
 end
 
 % create data directory
-if ~isdir(cfg.ptrndir)
-    mkdir(cfg.ptrndir);
+if ~isfolder(data.prepdir.imdir)
+    mkdir(data.prepdir.imdir);
 end
 
 %----------- Rearrange input tif stack  -----------
@@ -479,7 +490,7 @@ if data.prepdir.rearrange == 1
         uicontrolEnable('on',datalocal);
         return;
     end
-    stack = loadtif([data.prepdir.imdir,'.tif'],cfg.hndlwb);
+    stack = loadtif(data.prepdir.impath,cfg.hndlwb);
     
     [sy,sx,frames] = size(stack);
     
@@ -499,16 +510,12 @@ if data.prepdir.rearrange == 1
     end
     stack = reshape(stack,sy,sx,frames);
     
-    %     fig = waitbar(0,'Saving rearranged stack ...','Name','Saving ...','Tag','WaitBar','WindowStyle','modal');
-    progressbarGUI(cfg.hndlwb,0,'Saving rearranged stack ...','red');
+    progressbarGUI(cfg.hndlwb,0,'Saving final stack ...','red');
     for jj = 1:frames
-        %         waitbar(jj/frames,fig);
         progressbarGUI(cfg.hndlwb,jj/frames);
-        imwrite(stack(:,:,jj),[data.prepdir.imdir,filesep,data.prepdir.fileName],'WriteMode','append','Compression','none');
+        imwrite(stack(:,:,jj),[data.prepdir.imdir filesep data.prepdir.fileName],'WriteMode','append','Compression','none');
     end
-    
-    %     if ishandle(fig),delete(fig); end % close saving stack status bar
-    progressbarGUI(cfg.hndlwb,1,'Saving rearranged stack - DONE');
+    progressbarGUI(cfg.hndlwb,1,'Saving final stack - DONE');
 end
 
 %--------------------------------------------------
@@ -538,13 +545,13 @@ progressbarGUI(cfg.hndlwb,1/20,'Creating patterns');
 gen_repz(ptrns{1},cfg);
 
 % if the stack was not rearranged - use the input file and move it into the new directory
-if data.prepdir.rearrange == 0
-    copyfile([data.prepdir.impath],[data.prepdir.imdir,filesep,data.prepdir.fileName],'f');
+if data.prepdir.rearrange == 0 && datalocal.hndl.chkbxNewFolder.Value
+    copyfile([data.prepdir.impath],[data.prepdir.imdir filesep data.prepdir.fileName],'f');
 end
 
 % create description text file
 [~,imName,~] = fileparts(data.prepdir.fileName);
-outputFile = [data.prepdir.imdir,filesep,filesep,imName,'.txt'];
+outputFile = [data.prepdir.imdir filesep imName '.txt'];
 
 % waitbar(1/2,cfg.hndlwb,'Generating description file');
 progressbarGUI(datalocal.hndl.axPrgBar,0.95,'Generating description file');

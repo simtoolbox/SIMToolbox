@@ -37,12 +37,16 @@ wmerg = params.wmerg;           % Spectral merging weight
 [sy,sx,numseq] = size(IMseq);
 
 % simulate OTF of the microscope
-OTF = createOTF(sx,sy,fc*0.6);
+OTF = createOTF(sx,sy,0.6*fc);
 
 % blur patterns
 for ns = 1:numseq
     MaskOn(:,:,ns) = applyOTF(MaskOn(:,:,ns),OTF);
 end
+
+% figure; imshow(IMseq(:,:,idx),[])
+% figure; imshow(MaskOn(:,:,idx),[])
+% figure; idx = 1; imshowpair(MaskOn(1:floor(0.5*size(MaskOn,1))+20,:,idx),IMseq(:,:,idx));
 
 switch params.meth
     case 'CPU'
@@ -73,12 +77,12 @@ IMhom = imadjust(IMhom,[3*lambda,1],[0,1]);
 
 % upsample before spectral merging
 if params.upsample
-    IMmapf = imfft(fftInterpolate(imfft(IMmap),2*size(IMmap)));
-    IMhomf = imfft(fftInterpolate(imfft(IMhom),2*size(IMhom)));
+    IMmapf = seqfft2(fftInterpolate(seqfft2(IMmap),2*size(IMmap)));
+    IMhomf = seqfft2(fftInterpolate(seqfft2(IMhom),2*size(IMhom)));
     sx = 2*sx; sy = 2*sy;
 else
-    IMmapf = imfft(IMmap);
-    IMhomf = imfft(IMhom);
+    IMmapf = seqfft2(IMmap);
+    IMhomf = seqfft2(IMhom);
 end
 
 % Spectral merging
@@ -94,10 +98,19 @@ m2 = m2./max(m2(:));
 m1 = imcomplement(m2);
 
 temp = wmerg*IMmapf.*m1 + (1-wmerg)*IMhomf.*m2;
-IM = real(imifft(temp));
+IM = real(seqifft2(temp));
+
+% % upsample after spectral merging
+% if params.upsample
+%     IM = fftInterpolate(seqfft2(IM),2*size(IM));
+%     sx = 2*sx; sy = 2*sy;
+% end
 
 % Apply apodization
 IM = apodize(IM,sx,sy,fc,1);
+
+% hide edge artifacts (10 pixels)
+IM = IM.*(tukeywin(sy,10/sy)*tukeywin(sx,10/sx)');
 
 % Normalize output image
 if params.vidnorm.enable

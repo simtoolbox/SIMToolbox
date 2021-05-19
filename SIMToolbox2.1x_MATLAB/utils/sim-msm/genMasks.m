@@ -27,7 +27,7 @@ function MaskOn = genMasks(imginfo,ptrn,hndlwb)
 
 % Generate sinusoidal patterns for mapsim processing
 % hndlwb = waitbar(0,'Initializing ...','Name','Generating illumination masks ...','Tag','WaitBar','WindowStyle','modal');
-progressbarGUI(hndlwb,0,'Creating illumination mask ...','cyan');
+progressbarGUI(hndlwb,0,'Generating illumination mask ...','cyan');
 
 sx = imginfo.image.size.x;
 sy = imginfo.image.size.y;
@@ -38,7 +38,11 @@ MaskOn = struct('angle',[],'IMseq',[]);
 for itheta = find([ptrn.enable])
 %     waitbar(itheta/(2*numangles), hndlwb, 'Generating illumination masks ...');
     numphases = ptrn(itheta).num;
-    fi = ptrn(itheta).phsoff+2*pi*(0:numphases-1)/numphases;
+    if numel(ptrn(itheta).phsoff)>1
+        fi = ptrn(itheta).phsoff;
+    else
+        fi = ptrn(itheta).phsoff+2*pi*(0:numphases-1)/numphases;
+    end
     pattern = zeros(sy,sx,numphases);
     
     % estimate pattern frequency from the peak of the 1st harmonics
@@ -50,11 +54,11 @@ for itheta = find([ptrn.enable])
         ky = k(2);
         
         temp = sin(2*pi*kx*xx+2*pi*ky*yy+fi(iphi));
-%         temp(temp<0) = 0;
+%         temp(temp<0) = -1;
 %         temp(temp>0) = 1;
         pattern(:,:,iphi) = (temp+1)./(2*numphases);
         
-        progressbarGUI(hndlwb,(iphi+(th-1)*numphases)/(numphases*nAngles));
+        progressbarGUI(hndlwb,(iphi+(th-1)*numphases)/(2*numphases*nAngles));
     end
     th = th + 1;
     MaskOn(itheta).angle = ptrn(itheta).angle;
@@ -62,35 +66,38 @@ for itheta = find([ptrn.enable])
     MaskOn(itheta).IMseq = pattern;
 end
 
-% sum of the patterns for each angle has to lead to homegeneous illumination
-% for kk = 1:numangles
-%     waitbar((itheta+kk)/(2*numangles), hndlwb, 'Generating illumination masks ...');
-%     sum1 = sum(MaskOn(kk).IMseq,3)-1;
+% % sum of the patterns for each angle has to lead to homegeneous illumination
+% th = 1;
+% for itheta = find([ptrn.enable])
+% %     waitbar((itheta+kk)/(2*numangles), hndlwb, 'Generating illumination masks ...');
+%     sum1 = sum(MaskOn(itheta).IMseq,3)-1;
 %     
-%     numphases = size(seq(kk).IMseq,3);
-%     ispat = nan(siz(1),siz(2),numphases);
+%     numphases = ptrn(itheta).num;
+%     ispat = nan(sy,sx,numphases);
 %     for k = 1:numphases
-%         ispat(:,:,k) = sum1.*MaskOn(kk).IMseq(:,:,k);
+%         ispat(:,:,k) = sum1.*MaskOn(itheta).IMseq(:,:,k);
 %     end
 %     
-%     for m = 1:siz(1)
-%         for n = 1:siz(2)
+%     for m = 1:sy
+%         for n = 1:sx
 %             isone = find(ispat(m,n,:));
 %             if ~isempty(isone)
 %                 isone = isone(round(1 + (length(isone)-1)*rand(1)));
 %                 
-%                 MaskOn(kk).IMseq(m,n,[1:isone-1, isone+1:numphases]) = 0;
+%                 MaskOn(itheta).IMseq(m,n,[1:isone-1, isone+1:numphases]) = 0;
 %             end
 %         end
 %     end
+%     progressbarGUI(hndlwb,((nAngles+th)/(2*nAngles)));
+%     th = th + 1;
 % end
 
 % if ishandle(hndlwb), delete(hndlwb); end
 
-progressbarGUI(hndlwb,1,'Illumination mask is successfully created.','cyan');
+progressbarGUI(hndlwb,1,'Illumination mask is successfully generated.','cyan');
 end
 
 function a = rotxy(angle)
-a = [cos(angle)  -sin(angle);
-    sin(angle)	cos(angle)];
+a = [cos(angle) -sin(angle);
+     sin(angle)  cos(angle)];
 end

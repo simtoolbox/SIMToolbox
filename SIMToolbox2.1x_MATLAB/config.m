@@ -60,6 +60,8 @@ cfg.msm.thresh = 0.01;      % Convergence Threshold
 cfg.msm.wmerg = 0.85;       % Spectral merging weight
 cfg.msm.upsample = 0;
 
+cfg.msm.calib = 0;
+
 cfg.msm.vidnorm.enable = 0;
 cfg.msm.vidnorm.mapmax = NaN;
 cfg.msm.vidnorm.hommax = NaN;
@@ -113,7 +115,7 @@ cfg.db.spotfinder.radiusequal = 1;  % equal radius for all angles
 cfg.db.manual.k0 = 0;
 cfg.db.manual.angl = 0;
 cfg.db.manual.phsoff = 0;
-cfg.db.manual.radius = 8;           % corresponds to spatial frequency of a 1st harmonics
+cfg.db.manual.radius = 5.5;%8;  % corresponds to spatial frequency of a 1st harmonics
 cfg.db.manual.radiusequal = 1; 	% equal radius for all angles
 
 % initialize menu prepareDataDir

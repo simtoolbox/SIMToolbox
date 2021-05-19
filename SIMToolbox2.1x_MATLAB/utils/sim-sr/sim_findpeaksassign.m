@@ -32,15 +32,14 @@ tt = 1:min(imginfo.image.size.t,5);
 z_cnt = ceil(imginfo.image.size.z/2);
 zz = z_cnt-5:z_cnt+5;
 zz(zz<1|zz>imginfo.image.size.z) = [];
-TZ = length(tt)+length(zz); kt = 0; kz = 0;
+TZ = length(tt)*length(zz); ktz = 1;
 for t = tt
-    kt = kt+1;
     for z = zz
         seqtmp = seqload(imginfo,'t',t,'z',z,'offset',-cfg.ptrn.offset,'datatype','single');
-        if kz>0, seq = 0.5.*(seq+seqtmp); else, seq = seqtmp; end
-        kz = kz+1;
-        progressbarGUI(hndlwb,(kt+kz)/(TZ+num));
+        if z>zz(1), seq = 0.5.*(seq+seqtmp); else, seq = seqtmp; end
+        progressbarGUI(hndlwb,ktz/(TZ+num));
     end
+    ktz = ktz+1;
 end
 
 % concatenate ro + settings

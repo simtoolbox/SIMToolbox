@@ -1,9 +1,9 @@
 function IM = apodize(IM,sx,sy,fc,subbcg)
 omega = 2*fc;
 
-[k_x,k_y] = meshgrid(-sx/2+1:sx/2,-sy/2+1:sy/2);
-% s = min(size(IM));
-% [k_x,k_y] = meshgrid(linspace(-s/2+1,s/2,sx),linspace(-s/2+1,s/2,sy));
+% [k_x,k_y] = meshgrid(-sx/2+1:sx/2,-sy/2+1:sy/2);
+s = min(size(IM));
+[k_x,k_y] = meshgrid(linspace(-s/2+1,s/2,sx),linspace(-s/2+1,s/2,sy));
 k_r = sqrt(k_x.^2+k_y.^2);
 k_max = omega*max(k_r(:));
 apdf = cos(pi*k_r/(2*k_max));

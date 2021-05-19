@@ -10,9 +10,15 @@ otf.params.offset = [0 0];
 OTFfit = single(feval(['apodize_' otf.type],siz(1:2),otf.params));
 OTFfitConj = conj(OTFfit);
 
-phase = nan(np,1);
+phase = nan(1,np);
 for n = 1:np
     Dn = imft(:,:,n).*OTFfitConj;
+    
+    % proper calculation
+%     DnCorr = xcorr2(Dn); 
+%     phase(n) = -angle(DnCorr(round(peaky+size(Dn,1)),round(peakx+size(Dn,2))));
+    
+    % faster calc. gives the same results as xcorr2
     phase(n) = -angle(xcorr2xy(peakx,peaky,Dn));
 end
 

@@ -1,10 +1,11 @@
 clear; clc;
 
 addpath(genpath('utils'));
-load('testing.mat');
-savename = 'testing.tif';
+load('testing_fc.mat');
+savename = 'testing_fc.tif';
 if exist(savename,'file'), delete(savename); end
 
+params.upsample = 0;
 alph = params.alph;             % Initial Alpha
 lamb = params.lamb;             % Lambda (Normalization Coefficient)
 maxiter = params.maxiter;       % Maximum number of iterations allowed
@@ -13,12 +14,12 @@ thresh = params.thresh;         % Convergence Threshold
 
 [sy,sx,numseq] = size(IMseq);
 
-wmerg_seq = 0.94:0.02:1.00;
-fc_seq = 0.35:0.05:0.55;  % Cut-off frequency, usually around 0.3
+wmerg_seq = 1.00;%:0.01:1.0;
+fc_seq = 0.15:0.025:0.45;  % Cut-off frequency, usually around 0.3
 for wmerg = wmerg_seq
     for fc = fc_seq
         % simulate OTF of the microscope
-        OTF = createOTF(sy,sx,2*fc);
+        OTF = createOTF(sy,sx,0.6*fc);
         
         % blur patterns
         for ns = 1:numseq
@@ -63,15 +64,15 @@ for wmerg = wmerg_seq
         lambda = max(0.01,estimateNoise(IMhom));
         IMhom = imadjust(IMhom,[3*lambda,1],[0,1]);
         
-        % upsample before spectral merging
-        if params.upsample
-            IMmapf = imfft(fftInterpolate(imfft(IMmap),2*size(IMmap)));
-            IMhomf = imfft(fftInterpolate(imfft(IMhom),2*size(IMhom)));
-            sx = 2*sx; sy = 2*sy;
-        else
-            IMmapf = imfft(IMmap);
-            IMhomf = imfft(IMhom);
-        end
+%         % upsample before spectral merging
+%         if params.upsample
+%             IMmapf = seqfft2(fftInterpolate(seqfft2(IMmap),2*size(IMmap)));
+%             IMhomf = seqfft2(fftInterpolate(seqfft2(IMhom),2*size(IMhom)));
+%             sx = 2*sx; sy = 2*sy;
+%         else
+            IMmapf = seqfft2(IMmap);
+            IMhomf = seqfft2(IMhom);
+%         end
         
         % Spectral merging
         s = min(sx,sy);
@@ -86,10 +87,16 @@ for wmerg = wmerg_seq
         m1 = imcomplement(m2);
         
         temp = wmerg*IMmapf.*m1 + (1-wmerg)*IMhomf.*m2;
-        IM = real(imifft(temp));
+        IM = real(seqifft2(temp));
         
-        % Apply apodization
-        IM = apodize(IM,sx,sy,fc,1);
+        if params.upsample
+            IM = fftInterpolate(seqfft2(IM),2*size(IM));
+            % Apply apodization
+            IM = apodize(IM,2*sx,2*sy,fc,1);
+        else
+            % Apply apodization
+            IM = apodize(IM,sx,sy,fc,1);
+        end
         
         % Normalize output image
         if params.vidnorm.enable
@@ -105,4 +112,4 @@ for wmerg = wmerg_seq
     end
 end
 
-figure(43); imagesc(IM); axis equal;
+% figure(43); imagesc(IM); axis equal;
