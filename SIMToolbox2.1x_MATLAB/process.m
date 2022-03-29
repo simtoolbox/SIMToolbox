@@ -52,14 +52,12 @@ if ~isempty(ptrninfo) && ...
     % create pattern mask
     if strcmp(cfg.sim.spotfindermethod.type,'calibration')
         if ~isempty(calinfo)
-            cfg.msm.estimate = 0;
             ptrninfo.MaskOn = seq2subseq(ptrnmaskprecompute(imginfo, ptrninfo, calinfo, ...
                 'runningorder', cfg.ptrn.ro,'sigma',cfg.ptrn.blure,'progressbar',hndlprb),ptrninfo,cfg.ptrn.ro);
         else
             return;
         end
     else
-        cfg.msm.estimate = 1;
         ptrninfo.MaskOn = genMasks(imginfo,ptrn,hndlprb);
     end
 end
@@ -235,7 +233,7 @@ assert(ptrngetnumseq(ptrninfo, cfg.ptrn.ro) == imginfo.image.size.seq, 'process:
 
 % initialize output directory and remove all existing tif files
 cfg.resdir = fixresname(cfg.resdir, imginfo.data.dir, imginfo.data.filemask);
-if ~isdir(cfg.resdir)
+if ~isfolder(cfg.resdir)
     mkdir(cfg.resdir);
 else
     delete([cfg.resdir filesep '*.tif']);

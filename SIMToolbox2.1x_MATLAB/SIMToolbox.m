@@ -39,15 +39,15 @@ if nargin == 0 % LAUNCH GUI
     % load default configuration
     cfg = config();
     % default path settings for datadir
-    if ~isdir(cfg.datadir)
+    if ~isfolder(cfg.datadir)
         cfg.datadir = pwd;
     end
     % default path settings for calibration file
-    if ~(isdir(cfg.cal.calibr) || isfilest(cfg.cal.calibr))
+    if ~(isfolder(cfg.cal.calibr) || isfilest(cfg.cal.calibr))
         cfg.cal.calibr = cfg.datadir;
     end
     % default path settings for pattern repz
-    if ~(isdir(cfg.ptrn.repz) || isfilest(cfg.ptrn.repz))
+    if ~(isfolder(cfg.ptrn.repz) || isfilest(cfg.ptrn.repz))
         cfg.ptrn.repz = cfg.datadir;
     end
     % turn off some strange message when oppening tiff
@@ -272,33 +272,33 @@ axes('Parent',hmain,...
 % ----------- Right side ----------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 psiz = get(hmain,'Position'); psiz(1:2) = [0 mainheight];
-
-% ----------- SIM PROCESSING OPTIONS ----------
 txtwidth = 150;
-height = hTitle+3*dlgmargin+5*hLine;
-hsim = uipanel('Parent',hmain,'Units','pixels',...
-    'Position',[width+dlgmargin,psiz(2)-height-10,width-2*dlgmargin,height],...
-    'Title','SR-SIM processing (Gustafsson)');
-psiz = get(hsim,'Position'); top = psiz(4) - hTitle - dlgmargin;
+
+% ----------- OTF + APODIZATION OPTIONS -------
+height = hTitle+3*dlgmargin+2*hLine;
+hotf = uipanel('Parent',hmain,'Units','pixels',...
+    'Position',[width+dlgmargin,psiz(2)-height,width-2*dlgmargin,height],...
+    'Title','OFT + Apodization');
+psiz = get(hotf,'Position'); top = psiz(4) - hTitle - dlgmargin;
 
 % OTF
-uicontrol('Parent',hsim,'Style','text','String','OTF:',...
+uicontrol('Parent',hotf,'Style','text','String','OTF:',...
     'Units','pixels','Position',[dlgmargin,top-1*hLine,txtwidth,hTxt],...
     'HorizontalAlignment','left');
 
-uicontrol('Parent',hsim,'Style','popupmenu','String',{cfg.db.otf.name},...
+uicontrol('Parent',hotf,'Style','popupmenu','String',{cfg.db.otf.name},...
     'Tag','popSimOTF',...
     'Callback','SIMToolbox(''popSim_Callback'',gcbo,''otf'')',...
     'Units','pixels','Position',[dlgmargin+txtwidth,top-1*hLine,120,hPopup],...
     'BackgroundColor','w');
 
 for I = 1:2
-    uicontrol('Parent',hsim,'Style','text','String','param:',...
+    uicontrol('Parent',hotf,'Style','text','String','param:',...
         'Tag','txtSimOTFParamName',...
         'Units','pixels','Position',[dlgmargin+txtwidth+122+(I-1)*85,top-1*hLine,50,hTxt],...
         'HorizontalAlignment','right');
     
-    uicontrol('Parent',hsim,'Style','edit',...
+    uicontrol('Parent',hotf,'Style','edit',...
         'Tag','editSimOTFParam',...
         'Callback','SIMToolbox(''editSimPopParam_Callback'',gcbo,''rad'',''otf'')',...
         'Units','pixels','Position',[dlgmargin+txtwidth+172+(I-1)*85,top-1*hLine,30,hEdtBx],...
@@ -306,72 +306,79 @@ for I = 1:2
 end
 
 % apodizing function
-uicontrol('Parent',hsim,'Style','text','String','Apodizing function:',...
+uicontrol('Parent',hotf,'Style','text','String','Apodizing function:',...
     'Units','pixels','Position',[dlgmargin,top-2*hLine,txtwidth,hTxt],...
     'HorizontalAlignment','left');
 
-uicontrol('Parent',hsim,'Style','popupmenu','String',{cfg.db.apodize.name},...
+uicontrol('Parent',hotf,'Style','popupmenu','String',{cfg.db.apodize.name},...
     'Tag','popSimApodize',...
     'Callback','SIMToolbox(''popSim_Callback'',gcbo,''apodize'')',...
     'Units','pixels','Position',[dlgmargin+txtwidth,top-2*hLine,120,hPopup],...
     'BackgroundColor','w');
 
 for I = 1:2
-    uicontrol('Parent',hsim,'Style','text','String','param:',...
+    uicontrol('Parent',hotf,'Style','text','String','param:',...
         'Tag','txtSimApodizeParamName',...
         'Units','pixels','Position',[dlgmargin+txtwidth+122+(I-1)*85,top-2*hLine,50,hTxt],...
         'HorizontalAlignment','right');
     
-    uicontrol('Parent',hsim,'Style','edit',...
+    uicontrol('Parent',hotf,'Style','edit',...
         'Tag','editSimApodizeParam',...
         'Callback','SIMToolbox(''editSimPopParam_Callback'',gcbo,''rad'',''apodize'')',...
         'Units','pixels','Position',[dlgmargin+txtwidth+172+(I-1)*85,top-2*hLine,30,hEdtBx],...
         'BackgroundColor','w');
 end
 
+% ----------- SIM PROCESSING OPTIONS ----------
+height = hTitle+2*dlgmargin+3*hLine;
+hsim = uipanel('Parent',hmain,'Units','pixels',...
+    'Position',[width+dlgmargin,psiz(2)-height,width-2*dlgmargin,height],...
+    'Title','SR-SIM processing (Gustafsson)');
+psiz = get(hsim,'Position'); top = psiz(4) - hTitle - dlgmargin;
+
 % weights on harmonics
 uicontrol('Parent',hsim,'Style','text','String','Weights on harmonics:',...
     'Tag','textHarmonWeights',...
-    'Units','pixels','Position',[dlgmargin,top-3*hLine,txtwidth,hTxt],...
+    'Units','pixels','Position',[dlgmargin,top-1*hLine,txtwidth,hTxt],...
     'HorizontalAlignment','left');
 
 for I = 1:5
     % harmonic
     uicontrol('Parent',hsim,'Style','text','String',sprintf('#%d:',I-1),...
         'Tag','txtSimWeigth',...
-        'Units','pixels','Position',[dlgmargin+txtwidth+(I-1)*62-16,top-3*hLine,30,hTxt],...
+        'Units','pixels','Position',[dlgmargin+txtwidth+(I-1)*62-16,top-1*hLine,30,hTxt],...
         'HorizontalAlignment','left');
     % edit box for weight
     uicontrol('Parent',hsim,'Style','edit',...
         'Tag','editSimWeigth',...
         'String',nnz(I-1),...
         'Callback',sprintf('SIMToolbox(''editSimWeigth_Callback'',gcbo,%d)',I),...
-        'Units','pixels','Position',[dlgmargin+txtwidth+(I-1)*62,top-3*hLine,30,hEdtBx],...
+        'Units','pixels','Position',[dlgmargin+txtwidth+(I-1)*62,top-1*hLine,30,hEdtBx],...
         'BackgroundColor','w');
 end
 
 % wiener parameter
 uicontrol('Parent',hsim,'Style','text','String','Wiener parameter:',...
-    'Units','pixels','Position',[dlgmargin,top-4*hLine,txtwidth,hTxt],...
+    'Units','pixels','Position',[dlgmargin,top-2*hLine,txtwidth,hTxt],...
     'HorizontalAlignment','left');
 
 uicontrol('Parent',hsim,'Style','edit',...
     'Tag','editSimWiener',...
     'Callback','SIMToolbox(''editSimWiener_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[dlgmargin+txtwidth,top-4*hLine,wEdtBx,hEdtBx],...
+    'Units','pixels','Position',[dlgmargin+txtwidth,top-2*hLine,wEdtBx,hEdtBx],...
     'BackgroundColor','w');
 
 % Enable SIM processing
 uicontrol('Parent',hsim,'Style','checkbox','String','Enable SR-SIM processing',...
     'Tag','chkbxSimEnable',...
     'Callback','SIMToolbox(''chkbxSimEnable_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[dlgmargin,top-5*hLine,txtwidth,hChkBx]);
+    'Units','pixels','Position',[dlgmargin,top-3*hLine,txtwidth,hChkBx]);
 
 % Up-sampling 2x
 uicontrol('Parent',hsim,'Style','checkbox','String','Up-sampling 2x',...
     'Tag','chkbxUpsampleSim',...
     'Callback','SIMToolbox(''chkbxUpsampleSim_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[dlgmargin+180,top-5*hLine,txtwidth,hChkBx]);
+    'Units','pixels','Position',[dlgmargin+180,top-3*hLine,txtwidth,hChkBx]);
 
 % ----------- MAP-SIM PROCESSING OPTIONS ------
 height = hTitle+2*dlgmargin+4*hLine+hTxt;
@@ -531,65 +538,63 @@ uicontrol('Parent',hsave,'Style','edit',...
     'HorizontalAlignment','left','BackgroundColor','w');
 
 % ----------- COMMANDS -----------
+ypos = psiz(2)-dlgmargin-hBtn;
 % Preview button
 uicontrol('Parent',hmain,'Style','pushbutton','String','Preview',...
     'Tag','btnPreview',...
     'Callback','SIMToolbox(''btnPreview_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[width+dlgmargin,psiz(2)-3*dlgmargin-hBtn,90,hBtn]);
+    'Units','pixels','Position',[width+dlgmargin,ypos,90,hBtn]);
 
 % Close preview button
 uicontrol('Parent',hmain,'Style','pushbutton','String','Close all',...
     'Tag','btnCloseAll',...
     'Callback','SIMToolbox(''btnCloseAll_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[width+dlgmargin+95,psiz(2)-3*dlgmargin-hBtn,90,hBtn]);
+    'Units','pixels','Position',[width+dlgmargin+95,ypos,90,hBtn]);
 
 % Preview - z
 uicontrol('Parent',hmain,'Style','text','String','z:',...
-    'Units','pixels','Position',[width+dlgmargin+187,1+psiz(2)-3*dlgmargin-hBtn,11,hTxt],...
+    'Units','pixels','Position',[width+dlgmargin+187,1+ypos,11,hTxt],...
     'HorizontalAlignment','right');
 uicontrol('Parent',hmain,'Style','popupmenu',...
     'Tag','popPreviewZ','String',cfg.db.preview.z,...
     'Callback','SIMToolbox(''popPreview_Callback'',gcbo,''z'')',...
-    'Units','pixels','Position',[width+dlgmargin+199,psiz(2)-3*dlgmargin-hBtn,35,hEdtBx]);
+    'Units','pixels','Position',[width+dlgmargin+199,ypos,35,hEdtBx]);
 
 % Preview - time
 uicontrol('Parent',hmain,'Style','text','String','t:',...
-    'Units','pixels','Position',[width+dlgmargin+235,1+psiz(2)-3*dlgmargin-hBtn,10,hTxt],...
+    'Units','pixels','Position',[width+dlgmargin+235,1+ypos,10,hTxt],...
     'HorizontalAlignment','right');
 uicontrol('Parent',hmain,'Style','popupmenu',...
     'Tag','popPreviewTime','String',cfg.db.preview.t,...
     'Callback','SIMToolbox(''popPreview_Callback'',gcbo,''t'')',...
-    'Units','pixels','Position',[width+dlgmargin+245,psiz(2)-3*dlgmargin-hBtn,35,hEdtBx]);
+    'Units','pixels','Position',[width+dlgmargin+245,ypos,35,hEdtBx]);
 
 % Preview - cm
 uicontrol('Parent',hmain,'Style','text','String','cm:',...
-    'Units','pixels','Position',[width+dlgmargin+280,1+psiz(2)-3*dlgmargin-hBtn,20,hTxt],...
+    'Units','pixels','Position',[width+dlgmargin+280,1+ypos,20,hTxt],...
     'HorizontalAlignment','right');
 uicontrol('Parent',hmain,'Style','popupmenu',...
     'Tag','popPreviewColormap','String',cfg.db.preview.cm,...
     'Callback','SIMToolbox(''popPreviewColormap_Callback'',gcbo,''cm'')',...
-    'Units','pixels','Position',[width+dlgmargin+300,psiz(2)-3*dlgmargin-hBtn,50,hEdtBx]);
+    'Units','pixels','Position',[width+dlgmargin+300,ypos,50,hEdtBx]);
 
 
 % Run button
 uicontrol('Parent',hmain,'Style','pushbutton','String','Run',...
     'Tag','btnRun',...
     'Callback','SIMToolbox(''btnRun_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[2*width-dlgmargin-110,psiz(2)-3*dlgmargin-hBtn,60,hBtn]);
+    'Units','pixels','Position',[2*width-dlgmargin-110,ypos,60,hBtn]);
 
 % Quit button
 uicontrol('Parent',hmain,'Style','pushbutton','String','Quit',...
     'Tag','btnQuit',...
     'Callback','SIMToolbox(''btnQuit_Callback'',gcbo,[])',...
-    'Units','pixels','Position',[2*width-dlgmargin-45,psiz(2)-3*dlgmargin-hBtn,45,hBtn]);
+    'Units','pixels','Position',[2*width-dlgmargin-45,ypos,45,hBtn]);
 
 % ----------- INITIALIZATION -----------
 % get handles of active objects
 data.hndl = guihandles(hmain);
-data.hndl.preview.sim = nan(1,1);  % sr image
-data.hndl.preview.vsm = nan(1,length(cfg.db.vsm)); % all vsm methods
-data.hndl.preview.msm = nan(1,1);  % map-sim image
-data.hndl.preview.fft = nan(1,3);  % fft of av, sr, mapsim
+data.hndl.preview = gobjects(1);
 
 % configuration
 data.cfg = cfg;
@@ -750,8 +755,10 @@ end
 % set spotfinder method for SR-SIM
 if isempty(data.calinfo) && isempty(data.cfg.sim.spotfindermethod)
     data.cfg.sim.spotfindermethod = spotfinder_method_spotfinder(data.cfg.db.spotfinder);
+    data.cfg.msm.spotfindermethod = spotfinder_method_spotfinder(data.cfg.db.spotfinder);
 elseif ~isempty(data.calinfo)
     data.cfg.sim.spotfindermethod = spotfinder_method_calibration;
+    data.cfg.msm.spotfindermethod = spotfinder_method_calibration;
 end
 % synchronize fields
 if ~any(strcmp(eventdata,{'data','init'}))
@@ -893,7 +900,7 @@ try
             data.cfg.sim.harmonweight((currentnumharmon+2):(maxnumharmon+1)) = 1; % add weight = 1 to new harmonics
         end
     end
-catch err
+catch %err
     data.cfg.sim.harmonweight = [];
     data.cfg.ptrn.angles = [];
 end
@@ -979,6 +986,7 @@ if ~isempty(choice.params)
     choice.params.resolution = data.imginfo.image.resolution.x;
 end
 data.cfg.sim.(eventdata) = struct('type',choice.type,'params',choice.params);
+data.cfg.msm.(eventdata) = struct('type',choice.type,'params',choice.params);
 switch eventdata
     case 'otf'
         setSimParams(h.Enable,eventdata,'OTF');
@@ -992,10 +1000,12 @@ function editSimPopParam_Callback(h,parname,eventdata)
 global data
 if strcmp(parname,'file')
     data.cfg.sim.(eventdata).params.(parname) = get(h,'String');  % eventdata = apodize / otf
+    data.cfg.msm.(eventdata).params.(parname) = get(h,'String');  % eventdata = apodize / otf
 else
     num = str2double(strrep(get(h,'String'),',','.'));
     if ~isnan(num)
         data.cfg.sim.(eventdata).params.(parname) = num;
+        data.cfg.msm.(eventdata).params.(parname) = num;
     end
 end
 % update parameter value in the database
@@ -1012,8 +1022,13 @@ function chkbxSimEnable_Callback(h,~)
 %-----------------------------------------------------------------------------
 global data
 data.cfg.sim.enable = get(h,'Value');
-if ~data.cfg.sim.enable
-    btnCloseAll_Callback();
+if ~data.cfg.sim.enable && any(isgraphics(data.hndl.preview))
+    id = logical(strcmp(data.cfg.db.sim.id,...
+        {data.hndl.preview.Tag}));
+    close(data.hndl.preview(id));
+    id = logical(strcmp([data.cfg.db.sim.id 'fft'],...
+        {data.hndl.preview.Tag}));
+    close(data.hndl.preview(id));
 end
 updateDlgMain('on');
 
@@ -1038,8 +1053,13 @@ function chkbxMsmEnable_Callback(h,~)
 %-----------------------------------------------------------------------------
 global data
 data.cfg.msm.enable = get(h,'Value');
-if ~data.cfg.msm.enable
-    btnCloseAll_Callback();
+if ~data.cfg.msm.enable && any(isgraphics(data.hndl.preview))
+    id = logical(strcmp(data.cfg.db.msm.id,...
+        {data.hndl.preview.Tag}));
+    close(data.hndl.preview(id));
+    id = logical(strcmp([data.cfg.db.msm.id 'fft'],...
+        {data.hndl.preview.Tag}));
+    close(data.hndl.preview(id));
 end
 updateDlgMain('on');
 
@@ -1103,10 +1123,6 @@ else
 end
 set(data.hndl.txtCudaInfo,'String',txt,'ForegroundColor',col,'Visible','on');
 
-% ============================================================================
-% VSM Processing Options
-% ============================================================================
-
 %-----------------------------------------------------------------------------
 function ptrninfo = computeptrnmask(imginfo,ptrninfo,calinfo,cfg)
 %-----------------------------------------------------------------------------
@@ -1116,13 +1132,22 @@ if ~isempty(calinfo) && isempty(ptrninfo.MaskOn)
         'runningorder',cfg.ptrn.ro,'sigma',cfg.ptrn.blure,'progressbar',data.hndl.axPrgBar),ptrninfo,cfg.ptrn.ro);
 end
 
+% ============================================================================
+% VSM Processing Options
+% ============================================================================
+
 %-----------------------------------------------------------------------------
 function chkbxVsmEval_Callback(h,idx)
 %-----------------------------------------------------------------------------
 global data
 data.cfg.vsm.eval(idx).enable = get(h,'Value');
-if ~data.cfg.vsm.eval(idx).enable
-    btnCloseAll_Callback();
+if ~data.cfg.vsm.eval(idx).enable && any(isgraphics(data.hndl.preview))
+    id = logical(strcmp(data.cfg.db.vsm(idx).id,...
+        {data.hndl.preview.Tag}));
+    close(data.hndl.preview(id));
+    id = logical(strcmp([data.cfg.db.vsm(idx).id 'fft'],...
+        {data.hndl.preview.Tag}));
+    close(data.hndl.preview(id));
 end
 updateDlgMain('on');
 
@@ -1255,81 +1280,63 @@ if (data.cfg.sim.enable || data.cfg.msm.enable) && ...
     end
 end
 
-switch h.String
-    case 'Refresh'
-%         btnCloseAll_Callback();
-    case 'Preview'
-        updateDlgMain('off','preview');
-        
-        % clear progress bar
-        progressbarGUI(data.hndl.axPrgBar);
-        
-        % figures positions (4x2)
-        sc = get(0,'screensize');
-        he = round(sc(4)/2.5); wi = round(sc(3)/4.5);
-        p = 0;
-        
-        sp{1} = [sc(1),      sc(4)-he,wi,he];
-        sp{3} = [sc(1)+wi,   sc(4)-he,wi,he];
-        sp{5} = [sc(1)+2*wi, sc(4)-he,wi,he];
-        sp{7} = [sc(1)+3*wi, sc(4)-he,wi,he];
-        
-        sp{2} = [sc(1),      sc(4)-2*he,wi,he];
-        sp{4} = [sc(1)+wi,   sc(4)-2*he,wi,he];
-        sp{6} = [sc(1)+2*wi, sc(4)-2*he,wi,he];
-        sp{8} = [sc(1)+3*wi, sc(4)-2*he,wi,he];
-        
-        % OS-SIM - create a figure for every method
-        for I = 1:length(data.cfg.vsm.eval)
-            if data.cfg.vsm.eval(I).enable && ~ishandle(data.hndl.preview.vsm(I))
-                data.hndl.preview.vsm(I) = figure; p = p+1;
-                set(gcf,'Name',data.cfg.db.vsm(I).name,'NumberTitle','off',...
-                    'OuterPosition',sp{p},...
-                    'DeleteFcn',sprintf('SIMToolbox(''onVsmPreviewClose_Callback'',%f,%d)',1,I)); % data.hndl.dlgMain
-            end
-        end
-        % FFT of Average
-        if any(ismember({data.cfg.db.vsm(find([data.cfg.vsm.eval.enable])).name},{'Average'})) && ...
-            ~ishandle(data.hndl.preview.fft(1))
-            data.hndl.preview.fft(1) = figure; p = p+1;
-            set(gcf,'Name','FFT of Average','NumberTitle','off',...
-                'OuterPosition',sp{p},...
-                'DeleteFcn',sprintf('SIMToolbox(''onFftPreviewClose_Callback'',%f,%d)',1,1)); % data.hndl.dlgMain
-        end
-        
-        % SR-SIM  - create a figure for sim reconstruction + FFT
-        if data.cfg.sim.enable
-            if ~ishandle(data.hndl.preview.sim(1))
-                data.hndl.preview.sim(1) = figure; p = p+1;
-                set(gcf,'Name','SR-SIM reconstruction','NumberTitle','off',...
-                    'OuterPosition',sp{p},...
-                    'DeleteFcn',sprintf('SIMToolbox(''onSimPreviewClose_Callback'',%f,%d)',1,1)); % data.hndl.dlgMain
-            end
-            if ~ishandle(data.hndl.preview.fft(2))
-                data.hndl.preview.fft(2) = figure; p = p+1;
-                set(gcf,'Name','FFT of SR-SIM reconstruction','NumberTitle','off',...
-                    'OuterPosition',sp{p},...
-                    'DeleteFcn',sprintf('SIMToolbox(''onFftPreviewClose_Callback'',%f,%d)',1,2)); % data.hndl.dlgMain
-            end
-        end
-        
-        % MAP-SIM  - create a figure for sim reconstruction
-        if data.cfg.msm.enable
-            if ~ishandle(data.hndl.preview.msm(1))
-                data.hndl.preview.msm(1) = figure; p = p+1;
-                set(gcf,'Name','MAP-SIM reconstruction','NumberTitle','off',...
-                    'OuterPosition',sp{p},...
-                    'DeleteFcn', sprintf('SIMToolbox(''onMsmPreviewClose_Callback'',%f,%d)',1,1)); %data.hndl.dlgMain
-            end
-            if ~ishandle(data.hndl.preview.fft(3))
-                data.hndl.preview.fft(3) = figure; p = p+1;
-                set(gcf,'Name','FFT of MAP-SIM reconstruction','NumberTitle','off',...
-                    'OuterPosition',sp{p},...
-                    'DeleteFcn',sprintf('SIMToolbox(''onFftPreviewClose_Callback'',%f,%d)',1,3)); % data.hndl.dlgMain
-            end
-            
-        end
+Nvsm = sum([data.cfg.vsm.eval.enable]);
+Nsim = data.cfg.sim.enable;
+Nmsm = data.cfg.msm.enable;
+Nprv = Nvsm + Nsim + Nmsm;
+
+% figures positions (4x2)
+sc = get(0,'screensize');
+he = round(sc(4)/2.25); wi = round(sc(3)/4);
+stp = min(floor((sc(3)-wi)/Nprv),wi);
+
+% subfigures position
+sfp = cell(1,Nprv);
+for prv = 0:Nprv-1
+    sfp{2*prv+1} = [sc(1)+prv*stp, sc(4)-he,wi,he];
+    sfp{2*prv+2} = [sc(1)+prv*stp, sc(4)-2*he,wi,he];
 end
+
+updateDlgMain('off','preview');
+
+% clear progress bar
+progressbarGUI(data.hndl.axPrgBar);
+
+figNames = [{data.cfg.db.vsm(logical([data.cfg.vsm.eval.enable])).name},...
+    {data.cfg.db.sim(logical(data.cfg.sim.enable)).name},...
+    {data.cfg.db.msm(logical(data.cfg.msm.enable)).name}];
+figTags = [{data.cfg.db.vsm(logical([data.cfg.vsm.eval.enable])).id},...
+    {data.cfg.db.sim(logical(data.cfg.sim.enable)).id},...
+    {data.cfg.db.msm(logical(data.cfg.msm.enable)).id}];
+
+if isfield(data.hndl,'preview') && ...
+        any(isgraphics(data.hndl.preview)) && ...
+        any(contains(figNames,...
+        {data.hndl.preview(isgraphics(data.hndl.preview)).Name}))
+    Nfig_old = sum(contains(figNames,{data.hndl.preview(isgraphics(data.hndl.preview)).Name}));
+    
+    newFigsName = figNames(~contains(figNames,{data.hndl.preview(isgraphics(data.hndl.preview)).Name}));
+    newFigsTag = figTags(~contains(figNames,{data.hndl.preview(isgraphics(data.hndl.preview)).Name}));
+else
+    Nfig_old = 0;
+    newFigsName = figNames;
+    newFigsTag = figTags;
+end
+
+for nfig = 0:length(newFigsName)-1
+    data.hndl.preview(2*(Nfig_old+nfig)+1) = figure('Name',newFigsName{nfig+1},...
+        'NumberTitle','off','Tag',newFigsTag{nfig+1},...
+        'OuterPosition',sfp{2*(Nfig_old+nfig)+1},...
+        'DeleteFcn',sprintf('SIMToolbox(''onPreviewClose_Callback'',gcbo,"%s")',newFigsTag{nfig+1}));
+    
+%     if ~any(strcmp([newFigsTag{nfig+1} 'fft'],{data.hndl.preview.Tag}))
+    data.hndl.preview(2*(Nfig_old+nfig)+2) = figure('Name',[newFigsName{nfig+1} ' (FFT)'],...
+        'NumberTitle','off','Tag',[newFigsTag{nfig+1} 'fft'],...
+        'OuterPosition',sfp{2*(Nfig_old+nfig)+2},...
+        'DeleteFcn',sprintf('SIMToolbox(''onPreviewClose_Callback'',gcbo,"%s")',[newFigsTag{nfig+1} 'fft']));
+%     end
+end
+
 % load sequence for the current section & rewind according to pattern offset
 % split sequence if appropriate - based on the running order (e.g,several line patterns)
 seq = seq2subseq(seqload(data.imginfo,'z',data.cfg.preview.z,'t',data.cfg.preview.t,'offset',-data.cfg.ptrn.offset,'datatype','single'),data.ptrninfo,data.cfg.ptrn.ro);
@@ -1349,46 +1356,21 @@ end
 % which angles to process
 angles = logical([data.cfg.ptrn.angles.enable]);
 
-os = sum(~isnan(data.hndl.preview.vsm));
-sr = double(any(data.hndl.preview.sim));
-mp = double(any(data.hndl.preview.msm));
-p = os+sr+mp;
-
 % show preview figures
-updateVsmPreview(seq,angles,(0:os)./p);
-updateSimPreview(seq,angles,[os,os+sr]./p);
-updateMsmPreview(seq,angles,[os+sr,os+sr+mp]./p);
+if Nvsm, updateVsmPreview(seq,angles,(0:Nvsm)./Nprv); end
+if Nsim, updateSimPreview(seq,angles,[Nvsm,Nvsm+Nsim]./Nprv); end
+if Nmsm, updateMsmPreview(seq,angles,[Nvsm+Nsim,Nvsm+Nsim+Nmsm]./Nprv); end
 progressbarGUI(data.hndl.axPrgBar,1,'Preview completed');
 
 updatePreviewBtn;
-
 
 %-----------------------------------------------------------------------------
 function btnCloseAll_Callback(~,~)
 %-----------------------------------------------------------------------------
 global data
-for I = 1:length(data.hndl.preview.sim)
-    if ishandle(data.hndl.preview.sim(I))
-        close(data.hndl.preview.sim(I));
-        data.hndl.preview.sim(I) = NaN;
-    end
-end
-for I = 1:length(data.hndl.preview.msm)
-    if ishandle(data.hndl.preview.msm(I))
-        close(data.hndl.preview.msm(I));
-        data.hndl.preview.sim(I) = NaN;
-    end
-end
-for I = 1:length(data.hndl.preview.vsm)
-    if ishandle(data.hndl.preview.vsm(I))
-        close(data.hndl.preview.vsm(I));
-        data.hndl.preview.vsm(I) = NaN;
-    end
-end
-for I = 1:length(data.hndl.preview.fft)
-    if ishandle(data.hndl.preview.fft(I))
-        close(data.hndl.preview.fft(I));
-        data.hndl.preview.fft(I) = NaN;
+if isfield(data.hndl,'preview') && any(isgraphics(data.hndl.preview))
+    for I = 1:length(data.hndl.preview)
+        close(data.hndl.preview(1));
     end
 end
 
@@ -1397,9 +1379,9 @@ function popPreview_Callback(h,eventdata)
 %-----------------------------------------------------------------------------
 global data
 data.cfg.preview.(eventdata) = h.Value;	% eventdata = z / t
-if any([data.hndl.preview.msm,data.hndl.preview.vsm,data.hndl.preview.sim])
-    refreshPreview.String = 'Preview';
-    btnPreview_Callback(refreshPreview)
+if any(isgraphics(data.hndl.preview))
+%     refreshPreview.String = 'Preview';
+%     btnPreview_Callback(refreshPreview)
 end
 
 %-----------------------------------------------------------------------------
@@ -1407,8 +1389,10 @@ function popPreviewColormap_Callback(h,~)
 %-----------------------------------------------------------------------------
 global data
 data.cfg.preview.cm = data.cfg.db.preview.cm{h.Value};
-figs = [data.hndl.preview.sim,data.hndl.preview.msm,data.hndl.preview.vsm];
-for f = figs(~isnan(figs))
+figs = data.hndl.preview;
+figs = figs(isgraphics(figs));
+figs = figs(~contains({data.hndl.preview.Tag},'fft'));
+for f = figs
     figure(f); colormap(data.cfg.preview.cm);
 end
 
@@ -1417,9 +1401,9 @@ function updateVsmPreview(seq,angles,se)
 %-----------------------------------------------------------------------------
 global data
 % do nothing if no preview is open
-if ~any(ishandle([data.hndl.preview.vsm]))
-    return
-end
+% if ~any(ishandle([data.hndl.preview]))
+%     return
+% end
 % close preview if no pattern is open or number of patterns does not agree
 if isempty(data.ptrninfo) || ptrngetnumseq(data.ptrninfo,data.cfg.ptrn.ro) ~= data.imginfo.image.size.seq
     btnCloseAll_Callback();
@@ -1434,25 +1418,27 @@ id = 1;
 progressbarGUI(data.hndl.axPrgBar,se(id),'Calculating OS-SIM preview ...');
 % process the sequence for every method
 for I = find([data.cfg.vsm.eval.enable])
-    if ishandle(data.hndl.preview.vsm(I))
-        if any(angles)
-            if data.cfg.db.vsm(I).applymask
-                IM = feval(data.cfg.vsm.eval(I).fnc,seq(angles),data.ptrninfo.MaskOn(angles));
-            else
-                IM = feval(data.cfg.vsm.eval(I).fnc,seq(angles));
-            end
+    if any(angles)
+        if data.cfg.db.vsm(I).applymask
+            IM = feval(data.cfg.vsm.eval(I).fnc,seq(angles),data.ptrninfo.MaskOn(angles));
         else
-            IM = zeros([data.imginfo.image.size.y,data.imginfo.image.size.x]);
+            IM = feval(data.cfg.vsm.eval(I).fnc,seq(angles));
         end
-        % show figure with 0.1% values saturated
-        figure(data.hndl.preview.vsm(I));
+    else
+        IM = zeros([data.imginfo.image.size.y,data.imginfo.image.size.x]);
+    end
+    
+    % show figures
+    if isgraphics(data.hndl.preview(strcmp(data.cfg.db.vsm(I).id,{data.hndl.preview.Tag})))
+        figure(data.hndl.preview(strcmp(data.cfg.db.vsm(I).id,{data.hndl.preview.Tag})));
+        clf;
         showimage(IM,data.cfg.preview.saturate,data.cfg.preview.cm);
     end
     
-    if ishandle(data.hndl.preview.fft(1))
-        IMav = feval(data.cfg.vsm.eval(1).fnc,seq(angles));
-        IMavFFT = seqfft2(IMav);
-        figure(data.hndl.preview.fft(1)); clf
+    if isgraphics(data.hndl.preview(strcmp([data.cfg.db.vsm(I).id 'fft'],{data.hndl.preview.Tag})))
+        IMavFFT = seqfft2(IM);
+        figure(data.hndl.preview(strcmp([data.cfg.db.vsm(I).id 'fft'],{data.hndl.preview.Tag})));
+        clf;
         showfft(IMavFFT);
         if isfield(data.cfg.sim.otf.params,'rad')
             c = size(IMavFFT)./min(size(IMavFFT)); % normalization constant
@@ -1478,10 +1464,7 @@ updateDlgMain('on','vsmpreview');
 function updateSimPreview(seq,angles,se)
 %-----------------------------------------------------------------------------
 global data
-% do nothing if no preview is open
-if ~any(ishandle([data.hndl.preview.sim]))
-    return
-end
+
 se = linspace(se(1),se(2),5);
 % close preview if no pattern is open or number of patterns does not agree
 if isempty(data.ptrninfo) || ptrngetnumseq(data.ptrninfo,data.cfg.ptrn.ro) ~= data.imginfo.image.size.seq
@@ -1511,31 +1494,31 @@ if data.cfg.sim.enable && any(angles)
         IMsr = imgrmpadding(IMsr,data.cfg.sim.smoothpadsize);
     end
     progressbarGUI(data.hndl.axPrgBar,se(5),'Calculating SR-SIM preview ...');
+    
     % show figures
-    if ishandle(data.hndl.preview.sim(1))
-        figure(data.hndl.preview.sim(1));
-        showimage(IMsr,data.cfg.preview.saturate,data.cfg.preview.cm);
-    end
-    if ishandle(data.hndl.preview.fft(2))
-        figure(data.hndl.preview.fft(2)); clf
-        showfft(IMsrFFT);
-        if isfield(data.cfg.sim.apodize.params,'rad')
-            c = size(IMsrFFT)./min(size(IMsrFFT)); % normalization constant
-            hold on
-            cnt = ceil((size(IMsrFFT)+1)/2);
-            t = linspace(0,2*pi,100);
-            rA = 2*data.cfg.sim.apodize.params.resolution/data.cfg.sim.apodize.params.rad;
-            x = cnt(2) + min(cnt)*c(2)*rA*cos(t);
-            y = cnt(1) + min(cnt)*c(1)*rA*sin(t);
-            plot(x,y,'m-');
-            
-            rO = 2*data.cfg.sim.otf.params.resolution/data.cfg.sim.otf.params.rad;
-            x = cnt(2) + min(cnt)*c(2)*rO*cos(t);
-            y = cnt(1) + min(cnt)*c(1)*rO*sin(t);
-            plot(x,y,'k-');
-            
-            legend('Apodization','OTF');
-        end
+    figure(data.hndl.preview(strcmp(data.cfg.db.sim.id,{data.hndl.preview.Tag})));
+    clf;
+    showimage(IMsr,data.cfg.preview.saturate,data.cfg.preview.cm);
+    
+    figure(data.hndl.preview(strcmp([data.cfg.db.sim.id 'fft'],{data.hndl.preview.Tag})));
+    clf;
+    showfft(IMsrFFT);
+    if isfield(data.cfg.sim.apodize.params,'rad')
+        c = size(IMsrFFT)./min(size(IMsrFFT)); % normalization constant
+        hold on
+        cnt = ceil((size(IMsrFFT)+1)/2);
+        t = linspace(0,2*pi,100);
+        rA = 2*data.cfg.sim.apodize.params.resolution/data.cfg.sim.apodize.params.rad;
+        x = cnt(2) + min(cnt)*c(2)*rA*cos(t);
+        y = cnt(1) + min(cnt)*c(1)*rA*sin(t);
+        plot(x,y,'m-');
+        
+        rO = 2*data.cfg.sim.otf.params.resolution/data.cfg.sim.otf.params.rad;
+        x = cnt(2) + min(cnt)*c(2)*rO*cos(t);
+        y = cnt(1) + min(cnt)*c(1)*rO*sin(t);
+        plot(x,y,'k-');
+        
+        legend('Apodization','OTF');
     end
 end
 updateDlgMain('on','simpreview');
@@ -1544,10 +1527,7 @@ updateDlgMain('on','simpreview');
 function updateMsmPreview(seq,angles,se)
 %-----------------------------------------------------------------------------
 global data
-% do nothing if no preview is open
-if ~any(ishandle([data.hndl.preview.msm]))
-    return
-end
+
 % close preview if no pattern is open or number of patterns does not agree
 if isempty(data.ptrninfo) || ptrngetnumseq(data.ptrninfo,data.cfg.ptrn.ro) ~= data.imginfo.image.size.seq
     btnCloseAll_Callback();
@@ -1560,12 +1540,10 @@ if any(angles)
     if strcmp(data.cfg.sim.spotfindermethod.type,'calibration')
         if data.cfg.msm.enable && isempty(data.ptrninfo.MaskOn) && ...
                 ~isempty(data.calinfo)
-            data.cfg.msm.estimate = 0;
             data.ptrninfo = computeptrnmask(data.imginfo,data.ptrninfo,data.calinfo,data.cfg);
         end
     else
         if data.cfg.msm.enable && isempty(data.ptrninfo.MaskOn)
-            data.cfg.msm.estimate = 1;
             data.ptrninfo.MaskOn = genMasks(data.imginfo,data.ptrn,data.hndl.axPrgBar);
         end
     end
@@ -1596,34 +1574,33 @@ if any(angles)
 else
     IMmap = zeros([data.imginfo.image.size.y,data.imginfo.image.size.x]);
 end
-% show figure with 0.1% values saturated
-if ishandle(data.hndl.preview.msm)
-    figure(data.hndl.preview.msm);
-    showimage(IMmap,data.cfg.preview.saturate,data.cfg.preview.cm);
-end
 
-if ishandle(data.hndl.preview.fft(3))
-    IMmapFFT = seqfft2(IMmap);
-    figure(data.hndl.preview.fft(3)); clf
-    showfft(IMmapFFT);
-%     if isfield(data.cfg.sim.apodize.params,'rad')
-%         c = size(IMmapFFT)./min(size(IMmapFFT)); % normalization constant
-%         hold on
-%         cnt = ceil((size(IMmapFFT)+1)/2);
-%         t = linspace(0,2*pi,100);
-%         rA = 2*data.cfg.sim.apodize.params.resolution/data.cfg.sim.apodize.params.rad;
-%         x = cnt(2) + min(cnt)*c(2)*rA*cos(t);
-%         y = cnt(1) + min(cnt)*c(1)*rA*sin(t);
-%         plot(x,y,'m-');
-%         
-%         rO = 2*data.cfg.sim.otf.params.resolution/data.cfg.sim.otf.params.rad;
-%         x = cnt(2) + min(cnt)*c(2)*rO*cos(t);
-%         y = cnt(1) + min(cnt)*c(1)*rO*sin(t);
-%         plot(x,y,'k-');
-%         
-%         legend('Apodization','OTF');
-%     end
-end
+% show figure with 0.1% values saturated
+figure(data.hndl.preview(strcmp(data.cfg.db.msm.id,{data.hndl.preview.Tag})));
+clf;
+showimage(IMmap,data.cfg.preview.saturate,data.cfg.preview.cm);
+
+IMmapFFT = seqfft2(IMmap);
+figure(data.hndl.preview(strcmp([data.cfg.db.msm.id 'fft'],{data.hndl.preview.Tag})));
+clf;
+showfft(IMmapFFT);
+
+c = size(IMmapFFT)./min(size(IMmapFFT)); % normalization constant
+hold on
+cnt = ceil((size(IMmapFFT)+1)/2);
+t = linspace(0,2*pi,100);
+rA = 2*data.cfg.msm.fc;
+x = cnt(2) + max(cnt)*c(2)*rA*cos(t);
+y = cnt(1) + max(cnt)*c(1)*rA*sin(t);
+plot(x,y,'m-');
+
+rO = 2*data.cfg.sim.otf.params.resolution/data.cfg.sim.otf.params.rad;
+x = cnt(2) + min(cnt)*c(2)*rO*cos(t);
+y = cnt(1) + min(cnt)*c(1)*rO*sin(t);
+plot(x,y,'k-');
+
+legend('Apodization','OTF');
+
 
 progressbarGUI(data.hndl.axPrgBar,se(2),'Calculating MAP-SIM preview ...');
 updateDlgMain('on','mapsimpreview');
@@ -1646,45 +1623,20 @@ axis off square tight
 set(gca,'Position',[0 0 1 1]);
 
 %-----------------------------------------------------------------------------
-function onSimPreviewClose_Callback(~,idx)
+function onPreviewClose_Callback(h,ftag)
 %-----------------------------------------------------------------------------
 global data
-data.hndl.preview.sim(idx) = NaN;
-updatePreviewBtn;
-
-%-----------------------------------------------------------------------------
-function onMsmPreviewClose_Callback(~,idx)
-%-----------------------------------------------------------------------------
-global data
-data.hndl.preview.msm(idx) = NaN;
-updatePreviewBtn;
-
-%-----------------------------------------------------------------------------
-function onVsmPreviewClose_Callback(~,idx)
-%-----------------------------------------------------------------------------
-global data
-data.hndl.preview.vsm(idx) = NaN;
-updatePreviewBtn;
-
-%-----------------------------------------------------------------------------
-function onFftPreviewClose_Callback(~,idx)
-%-----------------------------------------------------------------------------
-global data
-data.hndl.preview.fft(idx) = NaN;
+data.hndl.preview(strcmp(ftag,{data.hndl.preview(isgraphics(data.hndl.preview)).Tag})) = [];
 updatePreviewBtn;
 
 %-----------------------------------------------------------------------------
 function updatePreviewBtn
 %-----------------------------------------------------------------------------
 global data
-if all([isnan(data.hndl.preview.msm),...
-        isnan(data.hndl.preview.sim),...
-        isnan(data.hndl.preview.vsm)])
-    data.hndl.btnPreview.String = 'Preview';
+if all(~isgraphics(data.hndl.preview))
     set(data.hndl.btnCloseAll,'Enable','off');
     progressbarGUI(data.hndl.axPrgBar);
 else
-    data.hndl.btnPreview.String = 'Refresh';
     set(data.hndl.btnCloseAll,'Enable','on');
 end
 
@@ -1947,6 +1899,8 @@ else
     simenable = 0;
     simupsample = 0;
 end
+setSimParams(simproc,eventdata,'OTF');
+setSimParams(simproc,eventdata,'Apodize');
 set(data.hndl.btnSimFindPeaks,'Enable',simproc);
 set(data.hndl.chkbxSimEnable,'Value',simenable,'Enable',simproc);
 if data.hndl.chkbxSimEnable.Value && strcmp(simproc,'on')
@@ -1954,8 +1908,7 @@ if data.hndl.chkbxSimEnable.Value && strcmp(simproc,'on')
 else
     sim = 'off';
 end
-setSimParams(sim,eventdata,'OTF');
-setSimParams(sim,eventdata,'Apodize');
+
 setSimWeights(sim,eventdata);
 set(data.hndl.editSimWiener,'String',data.cfg.sim.wiener,'Enable',sim);
 set(data.hndl.chkbxUpsampleSim,'Value',simupsample,'Enable',sim);
@@ -2035,11 +1988,11 @@ end
 
 % set(data.hndl.btnDefaults,'Enable',state);
 set(data.hndl.btnPreview,'Enable',runstate);
-if strcmp(data.hndl.btnPreview.String,'Refresh')
-    set(data.hndl.btnCloseAll,'Enable','on');
-else
-    set(data.hndl.btnCloseAll,'Enable','off');
-end
+% if strcmp(data.hndl.btnPreview.String,'Refresh')
+%     set(data.hndl.btnCloseAll,'Enable','on');
+% else
+%     set(data.hndl.btnCloseAll,'Enable','off');
+% end
 set(data.hndl.popPreviewTime,'Value',data.cfg.preview.t,'Enable',vsmproc);
 set(data.hndl.popPreviewZ,'Value',data.cfg.preview.z,'Enable',vsmproc);
 set(data.hndl.popPreviewColormap,'Enable',vsmproc);

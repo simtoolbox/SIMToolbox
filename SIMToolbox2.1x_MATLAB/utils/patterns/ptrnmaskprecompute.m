@@ -54,8 +54,8 @@ end
 
 % update progress bar
 if ishandle(hndlwb)
-%   waitbar(0, hndl_progressbar, 'Creating illumination mask');
-  progressbarGUI(hndlwb,0,'Creating illumination mask ...','cyan');
+%     waitbar(0, hndl_progressbar, 'Creating illumination mask');
+    progressbarGUI(hndlwb,0,'Creating illumination mask ...','cyan');
 end
 
 % This is to suppress high frequency artifacts caused by interpolation
@@ -75,29 +75,29 @@ MaskOn = zeros([imginfo.image.size.y, imginfo.image.size.x, num], datatype);
 
 % for all pattern positions
 for I = 1:num
-
-  % update progress bar
-  if ~isempty(hndlwb)
-    if ishandle(hndlwb)
-%       waitbar(I/num, hndl_progressbar);
-      progressbarGUI(hndlwb,I/num);
-    else
-      MaskOn = [];
-      return;
+    
+    % update progress bar
+    if ~isempty(hndlwb)
+        if ishandle(hndlwb)
+%             waitbar(I/num, hndl_progressbar);
+            progressbarGUI(hndlwb,I/num);
+        else
+            MaskOn = [];
+            return;
+        end
     end
-  end
-
-  % load pattern
-  imptrn = ptrnload(ptrninfo, 'runningorder', numro, 'number', I, 'datatype', datatype);
-
-  % blure illumination pattern with PSF of the microscope
-  if ~isempty(maskblure)
-    imptrn = imfilterseparable(imptrn, maskblure, 'replicate');
-  end
-
-  % transform microdisplay illumination mask into camera coordinates
-  MaskOn(:,:,I) = ptrn2camera(imptrn);
-
+    
+    % load pattern
+    imptrn = ptrnload(ptrninfo, 'runningorder', numro, 'number', I, 'datatype', datatype);
+    
+    % blure illumination pattern with PSF of the microscope
+    if ~isempty(maskblure)
+        imptrn = imfilterseparable(imptrn, maskblure, 'replicate');
+    end
+    
+    % transform microdisplay illumination mask into camera coordinates
+    MaskOn(:,:,I) = ptrn2camera(imptrn);
+    
 end
 progressbarGUI(hndlwb,1,'Illumination mask is successfully created.','cyan');
 

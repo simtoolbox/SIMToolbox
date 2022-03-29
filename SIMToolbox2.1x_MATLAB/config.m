@@ -54,13 +54,13 @@ cfg.sim.upsample = 0;
 cfg.msm.enable = 0;
 cfg.msm.alph = 0.5;         % Initial Alpha
 cfg.msm.fc = 0.3;           % Cut-off frequency
+cfg.msm.otf = struct('type','standard','params',struct('rad',0.25));
+cfg.msm.apodize = struct('type','standard','params',struct('rad',0.18));
 cfg.msm.lamb  = 0.0001;     % Lambda (Normalization Coefficient)
 cfg.msm.maxiter = 5;        % Maximum number of iterations allowed
 cfg.msm.thresh = 0.01;      % Convergence Threshold
 cfg.msm.wmerg = 0.85;       % Spectral merging weight
 cfg.msm.upsample = 0;
-
-cfg.msm.calib = 0;
 
 cfg.msm.vidnorm.enable = 0;
 cfg.msm.vidnorm.mapmax = NaN;
@@ -102,6 +102,8 @@ cfg.db.preview.cm = {'gray','hot','isolum','jet',...
 cfg.db.otf = getapodizationnames;
 cfg.db.apodize = getapodizationnames;
 cfg.db.vsm = getvsmnames(cfg.vsm.eval);
+cfg.db.sim = struct('name','SR-SIM','id','sr');
+cfg.db.msm = struct('name','MAP-SIM','id','mapsim');
 cfg.db.spotfinder.filter = spotfinder_getnames('filter');
 cfg.db.spotfinder.detector = spotfinder_getnames('detector');
 cfg.db.spotfinder.estimator = spotfinder_getnames('estimator');

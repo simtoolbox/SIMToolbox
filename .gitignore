@@ -4,6 +4,7 @@ data/
 matlab/
 temp/
 Deploytool/
+sparceSIM/
 *.aux
 *.bak
 *.bbl

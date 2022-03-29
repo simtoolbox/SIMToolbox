@@ -36,7 +36,7 @@ function IM = seqcfmaxmin2av(IMseq)
 
 if nargin < 1
   IM.mfile = fileparts_name([mfilename('fullpath') '.m']);
-  IM.name = 'Max + Min - 2 Averave';
+  IM.name = 'Max + Min - 2 Average';
   IM.id = 'maxmin2av';
   IM.applymask = 0;
   return;

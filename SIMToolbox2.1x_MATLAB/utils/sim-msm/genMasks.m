@@ -58,7 +58,7 @@ for itheta = find([ptrn.enable])
 %         temp(temp>0) = 1;
         pattern(:,:,iphi) = (temp+1)./(2*numphases);
         
-        progressbarGUI(hndlwb,(iphi+(th-1)*numphases)/(2*numphases*nAngles));
+        progressbarGUI(hndlwb,(iphi+(th-1)*numphases)/(numphases*nAngles));
     end
     th = th + 1;
     MaskOn(itheta).angle = ptrn(itheta).angle;

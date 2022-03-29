@@ -37,7 +37,8 @@ wmerg = params.wmerg;           % Spectral merging weight
 [sy,sx,numseq] = size(IMseq);
 
 % simulate OTF of the microscope
-OTF = createOTF(sx,sy,0.6*fc);
+% OTF = createOTF(sx,sy,0.6*fc);
+OTF = single(feval(['apodize_' params.otf.type],[sy,sx],params.otf.params));
 
 % blur patterns
 for ns = 1:numseq
@@ -97,8 +98,13 @@ m2 = imresize(m2,[sy,sx]);
 m2 = m2./max(m2(:));
 m1 = imcomplement(m2);
 
-temp = wmerg*IMmapf.*m1 + (1-wmerg)*IMhomf.*m2;
-IM = real(seqifft2(temp));
+IMfft = wmerg*IMmapf.*m1 + (1-wmerg)*IMhomf.*m2;
+IM = real(seqifft2(IMfft));
+
+% % Spectral merging + Apodizing
+% A = feval(['apodize_' params.apodize.type],[sy,sx],params.apodize.params);
+% IMfft = A.*(wmerg*IMmapf.*m1 + (1-wmerg)*IMhomf.*m2);
+% IM = real(seqifft2(IMfft));
 
 % % upsample after spectral merging
 % if params.upsample

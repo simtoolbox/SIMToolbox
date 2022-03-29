@@ -11,7 +11,7 @@ indi =  k_r > k_max ;
 % apdf(indi) = realmin;
 apdf(indi) = 0;
 
-IMf = fftshift(fft2(IM));
+IMf = seqfft2(IM);
 
 if subbcg
     IMnoise = abs(IMf.*imcomplement(spectralMask(sx,sy,omega,1)));
@@ -23,7 +23,7 @@ if subbcg
 end
 IMf = IMf.*apdf; % apodization
 
-IM = real(ifft2(ifftshift(IMf)));
+IM = real(seqifft2(IMf));
 IM(IM<0) = 0;
 
 end

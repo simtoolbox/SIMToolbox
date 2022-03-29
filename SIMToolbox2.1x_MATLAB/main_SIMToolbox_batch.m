@@ -199,7 +199,6 @@ for f = ind
                 im.sr = processsim(seq(angles),ptrn(angles),cfg);
             end
             
-            
             % MAP-SIM processing
             if cfg.msm.enable
                 if ~exist('im','var') || ~isfield(im,'absexp')
@@ -208,7 +207,6 @@ for f = ind
                 
                 %%% if the calibration is not known and patterns are estimated from the data
                 if cfg.msm.enable && isempty(calinfo)
-                    cfg.msm.estimate = 1;
                     
                     if ~isempty(ptrninfo.MaskOn) % patterns were already estimated
                         [im.mapsim, cfg.msm] = mapsim( ...
@@ -231,7 +229,6 @@ for f = ind
                     
                 elseif cfg.msm.enable && ~isempty(calinfo)
                     %%% if the calibration is known - patterns are known
-                    cfg.msm.estimate = 0;
                     [im.mapsim, cfg.msm] = mapsim( ...
                         seq(angles),...
                         ptrninfo.MaskOn(angles),...

@@ -14,16 +14,18 @@ thresh = params.thresh;         % Convergence Threshold
 
 [sy,sx,numseq] = size(IMseq);
 
-wmerg_seq = 1.00;%:0.01:1.0;
-fc_seq = 0.15:0.025:0.45;  % Cut-off frequency, usually around 0.3
+wmerg_seq = 0.9; %0.80:0.05:0.95;
+fc_seq = 0.2:0.01:0.3;  % Cut-off frequency, usually around 0.3
 for wmerg = wmerg_seq
     for fc = fc_seq
         % simulate OTF of the microscope
-        OTF = createOTF(sy,sx,0.6*fc);
+%         OTF = createOTF(sy,sx,0.6*fc);
+        OTF = createOTF(sy,sx,0.5*fc);
         
         % blur patterns
         for ns = 1:numseq
-            MaskOnB(:,:,ns) = applyOTF(MaskOn(:,:,ns),OTF);
+%             MaskOnB(:,:,ns) = applyOTF(MaskOn(:,:,ns),OTF);
+            MaskOnB(:,:,ns) = MaskOn(:,:,ns);
             %         if ~mod(ns,3), figure; imshowpair(IMseq(:,:,ns),MaskOn(:,:,ns)); end
         end
         
