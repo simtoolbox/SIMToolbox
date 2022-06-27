@@ -11,7 +11,9 @@ Associated publications:
 
 > P. Křížek, T. Lukeš, M. Ovesný, K. Fliegel, G. M. Hagen,  _SIMToolbox: A MATLAB toolbox for structured illumination fluorescence microscopy_. Bioinformatics, 32(2), 318–320, (2016). [doi:10.1093/bioinformatics/btv576](https://doi.org/10.1093/bioinformatics/btv576)
 
+---
+
 Standalone application:
-> All standalone application installers can be found on project's [Google Drive](https://drive.google.com/drive/u/2/folders/1Kjs0F8ce0zOW5vhxr6i4A387n1godCyt).
+All standalone application installers can be found on project's [Google Drive](https://drive.google.com/drive/u/2/folders/1Kjs0F8ce0zOW5vhxr6i4A387n1godCyt){:target="_blank" rel="noopener"}.
 <!--
 **simtoolbox/SIMToolbox** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
