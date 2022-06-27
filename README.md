@@ -14,6 +14,6 @@ Associated publications:
 ---
 
 Standalone application:
-All standalone application installers can be found on project's [Google Drive](https://drive.google.com/drive/u/2/folders/1Kjs0F8ce0zOW5vhxr6i4A387n1godCyt){target="_blank"}.
+All standalone application installers can be found on the project's [Google Drive](https://drive.google.com/drive/u/2/folders/1Kjs0F8ce0zOW5vhxr6i4A387n1godCyt).
 <!--
 **simtoolbox/SIMToolbox** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
