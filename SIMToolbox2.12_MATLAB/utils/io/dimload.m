@@ -12,4 +12,5 @@ hTxtInf = 14; % info text
 hProg = 20;   % progress bar
 
 wEdtBx = 40;
-width = 480;
+mainwidth = 480;
+mainheight = 540;
