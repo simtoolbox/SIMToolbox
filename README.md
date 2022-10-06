@@ -9,7 +9,9 @@ Authors: Pavel Křížek, Tomáš Lukeš, Martin Ovesný, Jakub Pospíšil, Vojt
 Associated publications:
 > T. Lukeš, P. Křížek, Z. Švindrych, J. Benda, M. Ovesný, K. Fliegel, M. Klíma, G. M. Hagen,  _Three-dimensional super-resolution structured illumination microscopy with maximum a posteriori probability image estimation_, Optics Express, 22(24), 29805-29817, (2014). [doi:10.1364/OE.22.029805](https://doi.org/10.1364/OE.22.029805)
 
-> P. Křížek, T. Lukeš, M. Ovesný, K. Fliegel, G. M. Hagen,  _SIMToolbox: A MATLAB toolbox for structured illumination fluorescence microscopy_. Bioinformatics, 32(2), 318–320, (2016). [doi:10.1093/bioinformatics/btv576](https://doi.org/10.1093/bioinformatics/btv576)
+> P. Křížek, T. Lukeš, M. Ovesný, K. Fliegel, G. M. Hagen,  _SIMToolbox: A MATLAB toolbox for structured illumination fluorescence microscopy_, Bioinformatics, 32(2), 318–320, (2016). [doi:10.1093/bioinformatics/btv576](https://doi.org/10.1093/bioinformatics/btv576)
+
+> J. Pospíšil, T. Lukeš, J. Bendesky, K. Fliegel, K. Spendier, G.M. Hagen _Imaging tissues and cells beyond the diffraction limit with structured illumination microscopy and Bayesian image reconstruction_, GigaScience, 8(1), 1-12, (2019). [doi:10.1093/gigascience/giy126](https://doi.org/10.1093/gigascience/giy126)
 
 ---
 
