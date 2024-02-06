@@ -5,7 +5,7 @@ SIMToolbox is an open-source, modular set of functions for MATLAB equipped with 
 and designed for processing data acquired by structured illumination microscopy. 
 
 
-SIMToolbox, example data, and the online documentation are freely accessible at http://mmtg.fel.cvut.cz/SIMToolbox
+SIMToolbox, example data, and the online documentation are freely accessible at https://simtoolbox.github.io/
 
 For more information, please see the Suplementary. 
 -------------------------------------------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ SIMToolbox - MATLAB PACKAGE
 This folder contains MATLAB codes for the SIMToolbox. This comprehensive set of MATLAB functions is also equipped with a user friendly interface. 
 Open the file "SIMToolbox.m" in MATLAB and run it. It will launch the SIMToolbox GUI and automatically add all the necessary functions into your 
 MATLAB path. If you do not have MATLAB, you can use the standalone application instead. You may download it on our website: 
-http://mmtg.fel.cvut.cz/SIMToolbox 
+https://simtoolbox.github.io/
 
 ----------------------
 
