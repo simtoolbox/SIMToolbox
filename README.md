@@ -11,8 +11,9 @@ Associated publications:
 
 > P. Křížek, T. Lukeš, M. Ovesný, K. Fliegel, G. M. Hagen,  _SIMToolbox: A MATLAB toolbox for structured illumination fluorescence microscopy_, Bioinformatics, 32(2), 318–320, (2016). [doi:10.1093/bioinformatics/btv576](https://doi.org/10.1093/bioinformatics/btv576)
 
-> J. Pospíšil, T. Lukeš, J. Bendesky, K. Fliegel, K. Spendier, G.M. Hagen _Imaging tissues and cells beyond the diffraction limit with structured illumination microscopy and Bayesian image reconstruction_, GigaScience, 8(1), 1-12, (2019). [doi:10.1093/gigascience/giy126](https://doi.org/10.1093/gigascience/giy126)
+> J. Pospíšil, T. Lukeš, J. Bendesky, K. Fliegel, K. Spendier, G.M. Hagen, _Imaging tissues and cells beyond the diffraction limit with structured illumination microscopy and Bayesian image reconstruction_, GigaScience, 8(1), 1-12, (2019). [doi:10.1093/gigascience/giy126](https://doi.org/10.1093/gigascience/giy126)
 
+> M. T. M. Hannebelle, E. Raeth, S. M. Leitao, T. Lukeš, J. Pospíšil, C. Toniolo, O. F. Venzin, A. Chrisnandy, P. P. Swain, N. Ronceray, M. P. Lütolf, A. C. Oates, G.M. Hagen, T. Lasser, A. Radenovic, J. D. McKinney, G. E. Fantner, _Open-source microscope add-on for structured illumination microscopy_, Nature Communications, 15(1550), 1-8, (2024). [doi:10.1038/s41467-024-45567-7](https://doi.org/10.1038/s41467-024-45567-7)
 ---
 
 All standalone application installers can be found on the project's [Google Drive](https://drive.google.com/drive/u/2/folders/1Kjs0F8ce0zOW5vhxr6i4A387n1godCyt).
