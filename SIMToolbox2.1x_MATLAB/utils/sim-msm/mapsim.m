@@ -75,7 +75,7 @@ switch params.meth
         % NOTE: Ensure that you are using library that matches your matlab version.
         % Feel free to visit https://iriscores.com/mapsim/ for more information.
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        IMmap  = MapcoreCudaProcess(double(IMseq),double(OTF),double(MaskOn),maxiter,thresh,lamb,alph);
+        IMmap  = MapcoreCuda(double(IMseq),double(OTF),double(MaskOn),maxiter,thresh,lamb,alph);
 end
 
 % normalization MAP, ABSEXP
