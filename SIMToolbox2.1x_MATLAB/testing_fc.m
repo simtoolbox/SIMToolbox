@@ -41,13 +41,25 @@ for wmerg = wmerg_seq
             case 'CPU'
                 IMmap = mapcore(IMseq,MaskOnB,OTF,maxiter,numseq,lamb,alph,thresh);
             case 'CUDA'
-                %%% INIT CUDA ONCE HERE %%%
-                MapcoreCudaPrepare([sx,sy,numseq,maxiter,lamb,alph,thresh,fc]);
-                %%% INIT CUDA ONCE HERE %%%
-                IMmap = MapcoreCudaProcess(double(IMseq),double(OTF),double(MaskOnB));
-                %%% AFTER PROCESSING ALL ZPLANES %%%
-                MapcoreCudaFinish();
-                %%% AFTER PROCESSING ALL ZPLANES %%%
+
+
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                % CUDA Processing no longer requires 3 separate calls
+                % Memory Is manages as necessary within the library.
+                % If for whatever reason the user wish to manually clear the resources,
+                % call just MapcoreCuda('clean');
+                % @Param (#1): Image Sequence
+                % @Param (#2): Image Mask
+                % @Param (#3): OTF
+                % @Param (#4): Max Iteration Count
+                % @Param (#5): Convergence Threshold
+                % @Param (#6): Lambda
+                % @Param (#7): Alpha
+                % NOTE: Ensure that you are using library that matches your matlab version.
+                % Feel free to visit https://iriscores.com/mapsim/ for more information.
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                IMmap = MapcoreCuda(double(IMseq),double(OTF),double(MaskOnB),maxiter,thresh,lamb,alph);
+
         end
         
         % normalization MAP, ABSEXP

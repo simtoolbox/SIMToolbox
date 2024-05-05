@@ -1,4 +1,4 @@
-% Copyright © 2013,2014,2015 Pavel Krizek, Tomas Lukes, lukestom@fel.cvut.cz
+% Copyright ï¿½ 2013,2014,2015 Pavel Krizek, Tomas Lukes, lukestom@fel.cvut.cz
 %
 % This file is part of SIMToolbox.
 %
@@ -65,19 +65,6 @@ end
 if imginfo.image.size.t>1 && imginfo.image.size.z == 1 % video sequence
     cfg.msm.vidnorm.enable = 1;
 end
-
-%%% INIT CUDA ONCE HERE %%%
-if strcmp(cfg.msm.meth,'CUDA')
-    MapcoreCudaPrepare([...
-        imginfo.image.size.x,...
-        imginfo.image.size.y,...
-        sum(angles)*imginfo.image.size.seq/length(ptrn),...
-        cfg.msm.maxiter,...
-        cfg.msm.lamb,...
-        cfg.msm.alph,...
-        cfg.msm.thresh,...
-        cfg.msm.fc]);
-end %%% INIT CUDA ONCE HERE %%%
 
 nummeth = sum([cfg.vsm.eval.enable,cfg.sim.enable,cfg.msm.enable]);
 % clear progress bar
@@ -175,11 +162,6 @@ for T = 1:imginfo.image.size.t
         
     end%Z
 end%T
-
-%%% AFTER PROCESSING ALL ZPLANES %%%
-if strcmp(cfg.msm.meth,'CUDA')
-    MapcoreCudaFinish();
-end %%% AFTER PROCESSING ALL ZPLANES %%%
 
 if c
     progressbarGUI(hndlprb,'SIM reconstruction was canceled.','red');

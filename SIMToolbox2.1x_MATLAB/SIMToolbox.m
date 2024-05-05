@@ -1,4 +1,4 @@
-% Copyright © 2013-2020, Pavel Krizek, Tomas Lukes, Jakub Pospisil
+% Copyright ï¿½ 2013-2020, Pavel Krizek, Tomas Lukes, Jakub Pospisil
 % email: pospij27@fel.cvut.cz
 %
 % This file is part of SIMToolbox.
@@ -1550,27 +1550,12 @@ if any(angles)
 
     progressbarGUI(data.hndl.axPrgBar,se(1),'Calculating MAP-SIM preview ...','green');
     
-    %%% INIT CUDA ONCE HERE %%%
-    if strcmp(data.cfg.msm.meth,'CUDA')
-        MapcoreCudaPrepare([data.imginfo.image.size.x,data.imginfo.image.size.y,...
-            sum(angles)*data.imginfo.image.size.seq/length(data.ptrn),...
-            data.cfg.msm.maxiter,...
-            data.cfg.msm.lamb,...
-            data.cfg.msm.alph,...
-            data.cfg.msm.thresh,...
-            data.cfg.msm.fc]);
-    end %%% INIT CUDA ONCE HERE %%%
-    
     IMmap = mapsim(...
         seq(angles),...
         data.ptrninfo.MaskOn(angles),...
         seqcfhomodyne(seq(angles)),...
         data.cfg.msm);
     
-    %%% AFTER PROCESSING ALL ZPLANES %%%
-    if strcmp(data.cfg.msm.meth,'CUDA')
-        MapcoreCudaFinish();
-    end %%% AFTER PROCESSING ALL ZPLANES %%%
 else
     IMmap = zeros([data.imginfo.image.size.y,data.imginfo.image.size.x]);
 end

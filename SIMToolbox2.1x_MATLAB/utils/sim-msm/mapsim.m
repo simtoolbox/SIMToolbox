@@ -11,7 +11,7 @@ function [IM,params,IMmap] = mapsim(IMseq,MaskOn,IMhom,params)
 %   IM     ... [m x n]  final image computed from image sequence
 %
 
-% Copyright © 2014-2015 Tomas Lukes, lukestom@fel.cvut.cz
+% Copyright ï¿½ 2014-2015 Tomas Lukes, lukestom@fel.cvut.cz
 %
 % This file is part of SIMToolbox.
 %
@@ -49,15 +49,33 @@ end
 % figure; imshow(MaskOn(:,:,idx),[])
 % figure; idx = 1; imshowpair(MaskOn(1:floor(0.5*size(MaskOn,1))+20,:,idx),IMseq(:,:,idx));
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%% Grab Parameters %%%%%%%
+alph = params.alph;             % Initial Alpha
+lamb = params.lamb;             % Lambda (Normalization Coefficient)
+maxiter = params.maxiter;       % Maximum number of iterations allowed
+thresh = params.thresh;         % Convergence Threshold
+
 switch params.meth
     case 'CPU'
-        alph = params.alph;             % Initial Alpha
-        lamb = params.lamb;             % Lambda (Normalization Coefficient)
-        maxiter = params.maxiter;       % Maximum number of iterations allowed
-        thresh = params.thresh;         % Convergence Threshold
         IMmap = mapcore(IMseq,MaskOn,OTF,maxiter,numseq,lamb,alph,thresh);
     case 'CUDA'
-        IMmap = MapcoreCudaProcess(double(IMseq),double(OTF),double(MaskOn));
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % CUDA Processing no longer requires 3 separate calls
+        % Memory Is manages as necessary within the library.
+        % If for whatever reason the user wish to manually clear the resources,
+        % call just MapcoreCuda('clean');
+        % @Param (#1): Image Sequence
+        % @Param (#2): Image Mask
+        % @Param (#3): OTF
+        % @Param (#4): Max Iteration Count
+        % @Param (#5): Convergence Threshold
+        % @Param (#6): Lambda
+        % @Param (#7): Alpha
+        % NOTE: Ensure that you are using library that matches your matlab version.
+        % Feel free to visit https://iriscores.com/mapsim/ for more information.
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        IMmap  = MapcoreCudaProcess(double(IMseq),double(OTF),double(MaskOn),maxiter,thresh,lamb,alph);
 end
 
 % normalization MAP, ABSEXP
